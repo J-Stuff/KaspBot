@@ -88,13 +88,13 @@ class ModTicket(discord.ui.View):
         activeTickets = list(cursor)
         for ticket in activeTickets:
             if str(interaction.user.id) in ticket["userId"]:
-                await interaction.response.send_message("You already have a ticket open!")
+                await interaction.response.send_message("You already have a ticket open!", ephemeral=True)
                 return
                 
         await interaction.response.defer(ephemeral=True, thinking=True)
         embed = discord.Embed(title="Creating Ticket...", description="<a:loader2:1041678096228691980> -- Please wait", color=discord.colour.parse_hex_number("921515"))
         loadingMsg:discord.Message = await interaction.followup.send(embed=embed, ephemeral=True) #type:ignore    
-        category = get(interaction.guild.categories, id=getSetting("reportCategory")) #type:ignore
+        category = get(interaction.guild.categories, id=int(getSetting("reportCategory"))) #type:ignore
         channel = await interaction.guild.create_text_channel(f'ticket-{random.randint(1111, 9999)}', category=category) #type:ignore
         unix = int(time.time())
         payload = {

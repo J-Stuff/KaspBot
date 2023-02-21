@@ -6,7 +6,11 @@ from discord.ext import commands
 import dotenv
 from config.getSetting import getSetting
 dotenv.load_dotenv('./.env')
-os.remove('./logs/log.log')
+try:
+    os.remove('./logs/log.prev.log')
+except:
+    pass
+os.rename('./logs/log.log', './logs/log.prev.log')
 open('./database/cogs.db', 'w').close()
 
 logging.basicConfig(filename='./logs/log.log', encoding='utf-8', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)-8s %(message)s')

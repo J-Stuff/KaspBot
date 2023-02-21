@@ -201,46 +201,47 @@ class verificationClass(discord.ui.View):
             await interaction.response.send_modal(verificationQuestionare(self.bot))
 
 async def unverifiedKick(interaction:discord.Interaction, bot:commands.Bot):
-    logging.debug("Running unverifiedKick")
-    confirm = random.randint(111, 999)
-    logging.debug(f"Confirm code is: {confirm}")
-    confirmEmbed = discord.Embed(title="Warning!!!", 
-                                description=f"The action you are about to take is **Destructive**\n\nYou are about to kick all unverified members, that have been in the server for more than 14 days.\n\nDo you understand that after starting this action, that it cannot be stopped until complete?\n\nType the following code within 20 seconds to confirm. Or wait for 20 seconds to cancel. \n`{confirm}`",
-                                  color=discord.colour.parse_hex_number("ff0000"))
-    await interaction.response.send_message(embed=confirmEmbed)
-    def check(m:discord.Message):
-        logging.debug(f"Testing to see if response matches challange code || Challenge code: {confirm} // Response: {m.content}")
-        return m.content == str(confirm) and m.author == interaction.user
-    try:
-        response = await bot.wait_for("message", check=check, timeout=20)
-    except asyncio.TimeoutError:
-        await interaction.followup.send("Timeout passed. Command aborted!")
-        logging.debug("Challenge Timed out!")
-        return
-    else:
-        await interaction.followup.send("Authenticated!")
-        logging.debug("Challenge passed!")
-    
-    # ==========================================================
-
-    if interaction.guild == None:
-        logging.fatal("interaction.guild seems to be None?")
-        return
-    
-    unverifiedRole = interaction.guild.get_role(int(getSetting("unverifiedRoleId")))
-    verifiedRole = interaction.guild.get_role(int(getSetting("baseRole")))
-    async for user in interaction.guild.fetch_members(limit=None):
-        logging.debug(user)
-        if unverifiedRole in user.roles and verifiedRole not in user.roles:
-            logging.debug("is unverified")
-            logging.debug(user.joined_at)
-            if user.joined_at - datetime.timedelta(days=14) != 0: #type:ignore
-                logging.debug("is over 2 weeks, kicking!")
-                await interaction.followup.send(f"Kicking {user.name}", ephemeral=True)
-                await user.kick(reason="Kicked due to unverified scan!")
-                await interaction.followup.send(f"Kicked {user.mention} // Reason: Kicked due to unverified scan", ephemeral=True)
-                await adminCommandLogs(interaction.user, f"Kicked {user.mention} during unverified purge", interaction.channel, bot) #type:ignore
-                
+    if interaction.user.guild_permissions.administrator: #type:ignore
+        logging.debug("Running unverifiedKick")
+        confirm = random.randint(111, 999)
+        logging.debug(f"Confirm code is: {confirm}")
+        confirmEmbed = discord.Embed(title="Warning!!!", 
+                                    description=f"The action you are about to take is **Destructive**\n\nYou are about to kick all unverified members, that have been in the server for more than 14 days.\n\nDo you understand that after starting this action, that it cannot be stopped until complete?\n\nType the following code within 20 seconds to confirm. Or wait for 20 seconds to cancel. \n`{confirm}`",
+                                    color=discord.colour.parse_hex_number("ff0000"))
+        await interaction.response.send_message(embed=confirmEmbed)
+        def check(m:discord.Message):
+            logging.debug(f"Testing to see if response matches challange code || Challenge code: {confirm} // Response: {m.content}")
+            return m.content == str(confirm) and m.author == interaction.user
+        try:
+            response = await bot.wait_for("message", check=check, timeout=20)
+        except asyncio.TimeoutError:
+            await interaction.followup.send("Timeout passed. Command aborted!")
+            logging.debug("Challenge Timed out!")
+            return
         else:
-            logging.debug("is clear")
-    await interaction.followup.send("All done!")
+            await interaction.followup.send("Authenticated!")
+            logging.debug("Challenge passed!")
+        
+        # ==========================================================
+
+        if interaction.guild == None:
+            logging.fatal("interaction.guild seems to be None?")
+            return
+        
+        unverifiedRole = interaction.guild.get_role(int(getSetting("unverifiedRoleId")))
+        verifiedRole = interaction.guild.get_role(int(getSetting("baseRole")))
+        async for user in interaction.guild.fetch_members(limit=None):
+            logging.debug(user)
+            if unverifiedRole in user.roles and verifiedRole not in user.roles:
+                logging.debug("is unverified")
+                logging.debug(user.joined_at)
+                if user.joined_at - datetime.timedelta(days=14) == 0: #type:ignore
+                    logging.debug("is over 2 weeks, kicking!")
+                    await interaction.followup.send(f"Kicking {user.name}", ephemeral=True)
+                    await user.kick(reason="Kicked due to unverified scan!")
+                    await interaction.followup.send(f"Kicked {user.mention} // Reason: Kicked due to unverified scan", ephemeral=True)
+                    await adminCommandLogs(interaction.user, f"Kicked {user.mention} during unverified purge", interaction.channel, bot) #type:ignore
+                    
+            else:
+                logging.debug("is clear")
+        await interaction.followup.send("All done!")

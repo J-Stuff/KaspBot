@@ -108,8 +108,8 @@ class Admin(commands.Cog, name="Admin Commands"):
     @commands.command(help="Echos what is said in the command. Requires: mention_everyone", brief="Echo message")
     async def echo(self, ctx:commands.Context, *, repeat:str):
         if ctx.author.guild_permissions.mention_everyone: #type:ignore
-            await ctx.send(f"{repeat}")
             await ctx.message.delete()
+            await ctx.send(f"{repeat}")
             await adminCommandLogs(ctx.author, f"Made me echo: {repeat}", ctx.channel, self.bot)
 
     @commands.command(help="Shut down the bot. Requires: administrator", breif="Shutdown the Bot")
@@ -135,6 +135,12 @@ class Admin(commands.Cog, name="Admin Commands"):
                 logging.debug("Challenge passed!")
                 logging.fatal(f"Shutting down... || Authorized by: {ctx.author}")
                 sys.exit(f"Shutting down... || Authorized by: {ctx.author}")
+
+    @commands.command(help="Gives an Admin the log Files", breif="DM log files")
+    async def giveLog(self, ctx:commands.Context):
+        if ctx.author.guild_permissions.administrator: #type:ignore
+            await ctx.author.send(file=discord.File('./logs/log.log'))
+            await ctx.author.send(file=discord.File('./logs/log.prev.log'))
             
         
 
