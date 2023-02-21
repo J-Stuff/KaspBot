@@ -1,37 +1,44 @@
 import discord
+import os
 from discord.ext import commands
 import time
-from modules.logging.userEventLog import userEventLog
-from modules.config.loadConfigs import botConfig
+import logging
+from config.getSetting import getSetting
 
 
 async def onJoin(member: discord.Member, bot: commands.Bot):
-    guild = bot.get_guild(botConfig()["guild"])
-    unv_role = guild.get_role(botConfig()["unverifiedRoleId"])  # type:ignore
-    await member.add_roles(unv_role)  # type:ignore
+    logging.info("On join fired!")
+    guild = bot.get_guild(int(getSetting("guild")))
+    unv_role = guild.get_role(int(getSetting("unverifiedRoleId")))  # type:ignore
+    await member.add_roles(unv_role, reason="New user has joined the guild, Adding unverified role!")  # type:ignore
 
     userJoinedEmbed = discord.Embed(
         title="User Joined!", color=discord.colour.parse_hex_number("45be00"))
     userJoinedEmbed.set_author(
-        name=f"{member} ({member.id})", url=member.avatar)
+        name=f"{member} ({member.id})", icon_url=member.avatar)
     userJoinedEmbed.add_field(
         name="Username:", value=f"```{member}```", inline=False)
     userJoinedEmbed.add_field(
         name="User ID:", value=f"```{member.id}```", inline=False)
     userJoinedEmbed.add_field(
         name="Account Created", value=f"<t:{int(time.mktime(member.created_at.timetuple()))}:F>\n(Which was: <t:{int(time.mktime(member.created_at.timetuple()))}:R>)", inline=False)
-    await userEventLog(userJoinedEmbed, bot)
+    logChannel = await bot.fetch_channel(int(getSetting(os.getenv("SETTINGS_accountLog"))))
+    await logChannel.send(embed=userJoinedEmbed) #type:ignore
+
+
 
 
 async def onLeaveRaw(member: discord.RawMemberRemoveEvent, bot: commands.Bot):
+    logging.info("On left fired!")
     user = member.user
     userLeftEmbed = discord.Embed(
         title="User left!", colour=discord.colour.parse_hex_number("be0000"))
-    userLeftEmbed.set_author(name=f"{user} ({user.id})", url=user.avatar)
+    userLeftEmbed.set_author(name=f"{user} ({user.id})", icon_url=user.avatar)
     userLeftEmbed.add_field(
         name="Username:", value=f"```{user}```", inline=False)
     userLeftEmbed.add_field(
         name="User ID:", value=f"```{user.id}```", inline=False)
     userLeftEmbed.add_field(
         name="Account Created", value=f"<t:{int(time.mktime(user.created_at.timetuple()))}:F>\n(Which was: <t:{int(time.mktime(user.created_at.timetuple()))}:R>)", inline=False)
-    await userEventLog(userLeftEmbed, bot)
+    logChannel = await bot.fetch_channel(int(getSetting(os.getenv("SETTINGS_accountLog"))))
+    await logChannel.send(embed=userLeftEmbed) #type:ignore

@@ -1,16 +1,20 @@
-import time
 import discord
-import json
-from modules.logging.debugLog import debugLog
-from modules.config.loadConfigs import botConfig
+import datetime
+from discord.ext import commands
+from discord.utils import format_dt
+import os
+import logging
+from config.getSetting import getSetting
 
-async def userCommandLogs(user, command, channelId, bot):
-    debugLog("User command Logs was ran")
-    embed = discord.Embed(title="A Command was ran")
-    embed.set_author(name=f"{user} ({user.id})", icon_url=user.avatar)
-    embed.add_field(name="Command:", value=command, inline=False)
-    embed.add_field(
-        name="When:", value=f"<t:{int(time.time())}:T>", inline=False)
-    embed.add_field(name="Where:", value=f"<#{channelId}>", inline=False)
-    channel = bot.get_channel(int(botConfig()["command_log_channel"]))
-    await channel.send(embed=embed)     # type: ignore
+async def userCommandLogs(user:discord.User|discord.Member, message:str, channel, bot:commands.Bot):
+    logging.info("Admin logging was fired")
+    now = datetime.datetime.now()
+    longDate = format_dt(now, "D")
+    longTime = format_dt(now, "T")
+    embed = discord.Embed(color=discord.colour.parse_hex_number("5151fa"), title="User Logging")
+    embed.set_author(name=user.name, icon_url=user.avatar.url) #type:ignore
+    embed.add_field(name="Time", value=f"{longDate} @ {longTime}")
+    embed.add_field(name="Channel", value=channel.mention)
+    embed.add_field(name="Message", value=message)
+    logChannel = await bot.fetch_channel(int(getSetting(os.getenv("SETTINGS_commandLog"))))
+    await logChannel.send(embed=embed)     # type: ignore

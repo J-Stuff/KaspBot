@@ -1,12 +1,32 @@
 import json
+import os
+import sys
 import random
 import discord
+import logging
+from config.getSetting import getSetting
+from discord.ext import commands
 
-async def funStatus(bot):
-    with open('./resources/statusMessages.json', 'r') as fp:
-        statusMessages = json.loads(fp.read())
+async def funStatus(bot:commands.Bot):
+    from pymongo import MongoClient
+    CONNECTION_STRING = os.getenv("MONGO_connection_string")
+    client: MongoClient = MongoClient(CONNECTION_STRING)
+    database = os.getenv("MONGO_maindb")
+    if database == None:
+        logging.info("BAD ENV MONGO_maindb")
+        sys.exit()
     
-    newStatus = statusMessages[str(random.randint(0, 15))]
+    db = client[database]
+
+    collection = getSetting("MONGO_status_collection")
+    if collection == None:
+        logging.info("BAD DB MONGO_verification_collection")
+        sys.exit()
+        
+    statusStore = db[collection]
+    statusMessages = list(statusStore.find({}))
+    
+    newStatus = statusMessages[random.randint(0, (len(statusMessages)-1))]
 
     if newStatus["type"] == "playing":
         statusMsg = discord.Game(name=newStatus["content"])
