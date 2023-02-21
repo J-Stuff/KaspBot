@@ -6,10 +6,10 @@ from discord.ext import commands
 import dotenv
 from config.getSetting import getSetting
 dotenv.load_dotenv('./.env')
-os.remove('./logs.log')
+os.remove('./logs/log.log')
 open('./database/cogs.db', 'w').close()
 
-logging.basicConfig(filename='./logs.log', encoding='utf-8', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)-8s %(message)s')
+logging.basicConfig(filename='./logs/log.log', encoding='utf-8', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)-8s %(message)s')
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
