@@ -10,7 +10,10 @@ try:
     os.remove('./logs/log.prev.log')
 except:
     pass
-os.rename('./logs/log.log', './logs/log.prev.log')
+try:
+    os.rename('./logs/log.log', './logs/log.prev.log')
+except:
+    pass
 open('./database/cogs.db', 'w').close()
 
 logging.basicConfig(filename='./logs/log.log', encoding='utf-8', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)-8s %(message)s')

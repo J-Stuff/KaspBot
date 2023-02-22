@@ -47,7 +47,7 @@ class Admin(commands.Cog, name="Admin Commands"):
             with open('./database/uptime.db', 'r') as fp:
                 uptimeUnix = float(fp.read())
             uptime = str(datetime.timedelta(seconds=int(round(time.time()-uptimeUnix))))
-            info = getSetting("botVersion")
+            info = "1.2.1"
             await ctx.send(f"Pong!\n<:satellite:1034018740897075231> `{str(ping_ms)} ms`\nI'm running KaspBot Version: {info}\nUptime: {uptime}")
 
 

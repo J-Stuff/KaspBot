@@ -20,8 +20,9 @@ class Listeners(commands.Cog, name="On Event Listeners"):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-        if self.bot.user.mentioned_in(message): #type:ignore
-            await message.reply(f"Greetings {message.author.mention}!")
+        if self.bot.user.mentioned_in(message) and message.author != self.bot.user: #type:ignore
+            if "@everyone" not in message.content and "@here" not in message.content:
+                await message.reply(f"Greetings {message.author.mention}!")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
