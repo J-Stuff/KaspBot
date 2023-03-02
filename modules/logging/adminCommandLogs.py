@@ -5,7 +5,8 @@ import os
 import logging
 from discord.ext import commands
 from discord.utils import format_dt
-from config.getSetting import getSetting
+from config.getConfig import settings as unsetSettings
+settings = unsetSettings()
 
 async def adminCommandLogs(user:discord.User|discord.Member, message:str, channel, bot:commands.Bot):
     logging.info("Admin logging was fired")
@@ -13,11 +14,11 @@ async def adminCommandLogs(user:discord.User|discord.Member, message:str, channe
     longDate = format_dt(now, "D")
     longTime = format_dt(now, "T")
     embed = discord.Embed(color=discord.colour.parse_hex_number("5151fa"), title="Admin logging")
-    embed.set_author(name=user.name, icon_url=user.avatar.url) #type:ignore
+    embed.set_author(name=user.name, icon_url=user.display_avatar.url) #type:ignore
     embed.add_field(name="Time", value=f"{longDate} @ {longTime}")
     embed.add_field(name="Channel", value=channel.mention)
     embed.add_field(name="Message", value=message)
-    logChannelID = getSetting(os.getenv("SETTINGS_adminLog"))
+    logChannelID = settings.getChannelID("adminLogs")
     logChannel = await bot.fetch_channel(int(logChannelID))
     if not type(logChannel) == discord.TextChannel:
         sys.exit("BAD CHANNEL ID FOR: admin_log_channel")

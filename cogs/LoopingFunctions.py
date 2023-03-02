@@ -1,5 +1,4 @@
 from modules.fun.statusRotate import funStatus
-import discord
 import logging
 from discord.ext import commands, tasks
 

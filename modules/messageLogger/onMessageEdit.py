@@ -3,7 +3,8 @@ import time
 import discord
 import logging
 from discord.ext import commands
-from config.getSetting import getSetting
+from config.getConfig import settings as unsettings
+settings = unsettings()
 async def onMessageEdit(message_before:discord.Message, message_after:discord.Message, bot:commands.Bot):
     if message_before.author.id == bot.user.id or message_after.content == message_before.content:  # type: ignore
         return
@@ -19,5 +20,5 @@ async def onMessageEdit(message_before:discord.Message, message_after:discord.Me
         embed.add_field(name="Contents After:", value=f"```{message_after.attachments}```")
     embed.set_author(name=f"{message_before.author} ({message_before.author.id})",
                      icon_url=message_before.author.avatar)
-    channel = bot.get_channel(int(getSetting(os.getenv("SETTINGS_messageLog"))))
+    channel = bot.get_channel(int(settings.getChannelID("messageLogs")))
     await channel.send(embed=embed) #type:ignore

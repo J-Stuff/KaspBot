@@ -4,7 +4,6 @@ import sys
 import discord
 from discord.ext import commands
 import dotenv
-from config.getSetting import getSetting
 dotenv.load_dotenv('./.env')
 try:
     os.remove('./logs/log.prev.log')
@@ -23,7 +22,6 @@ stream_handler.setLevel(logging.DEBUG)
 stream_handler.setFormatter(formatter)
 logger = logging.getLogger()
 logger.addHandler(stream_handler)
-
 
 class KaspBot(commands.Bot):
     def __init__(self):
@@ -45,7 +43,7 @@ class KaspBot(commands.Bot):
 
 if __name__ in "__main__":
     bot = KaspBot()
-    token = getSetting(os.getenv("SETTINGS_dToken")) #type:ignore
+    token = os.getenv("discord_token") 
     if token:
         logging.info(f"logging in with: {token}")
         bot.run(token=token, reconnect=True)

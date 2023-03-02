@@ -8,6 +8,12 @@ class Listeners(commands.Cog, name="On Event Listeners"):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
 
+    async def checkIfPinged(self, message:discord.Message):
+        if self.bot.user.mentioned_in(message) and message.author != self.bot.user: #type:ignore
+            if message.reference is None:
+                if "@everyone" not in message.content and "@here" not in message.content:
+                    await message.reply(f"Greetings {message.author.mention}!")
+
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         from modules.messageLogger.onMessageDelete import onMessageDelete
@@ -20,9 +26,7 @@ class Listeners(commands.Cog, name="On Event Listeners"):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-        if self.bot.user.mentioned_in(message) and message.author != self.bot.user: #type:ignore
-            if "@everyone" not in message.content and "@here" not in message.content:
-                await message.reply(f"Greetings {message.author.mention}!")
+        await self.checkIfPinged(message)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -30,7 +34,7 @@ class Listeners(commands.Cog, name="On Event Listeners"):
         await onJoin(member, self.bot)
 
     @commands.Cog.listener()
-    async def on_raw_member_remove(self, payload):
+    async def on_raw_member_remove(self, payload:discord.RawMemberRemoveEvent):
         from modules.logging.userActions import onLeaveRaw
         await onLeaveRaw(payload, self.bot)
 

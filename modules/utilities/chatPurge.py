@@ -1,11 +1,16 @@
 from modules.logging.adminCommandLogs import adminCommandLogs
-
-async def chatPurge(interaction, count, bot):
-    count += 1
-    if not interaction.user.guild_permissions.manage_messages:
-        await interaction.response.send_message(f"You don't have permissions to do that!", ephemeral=True)
+import discord
+from discord.ext import commands
+import logging
+async def chatPurge(interaction:discord.Interaction, count, bot:commands.Bot):
+    channel = interaction.channel
+    if not channel:
+        logging.fatal("Channel is None in purge, Failing!")
         return
-    await interaction.response.defer(ephemeral=False, thinking=False)
-    await interaction.channel.purge(limit=count)
-    await interaction.channel.send(f"Done! Purged `{count}` messages!")
+    if type(channel) is not discord.TextChannel:
+        logging.info("Channel is not textchannel when purge called. Failing")
+        return
+    await interaction.response.defer(ephemeral=False, thinking=True)
+    await channel.purge(limit=count)
+    await channel.send(f"Done! Purged `{count}` messages!")
     await adminCommandLogs(interaction.user, f"Purged {count} messages!", interaction.channel, bot)

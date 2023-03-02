@@ -1,7 +1,8 @@
 from discord.ext import commands
 from discord import app_commands
-from config.getSetting import getSetting
 from modules.logging.adminCommandLogs import adminCommandLogs
+from config.getConfig import settings as unsettings
+settings = unsettings()
 import discord
 import os
 import sys
@@ -47,8 +48,8 @@ class Admin(commands.Cog, name="Admin Commands"):
             with open('./database/uptime.db', 'r') as fp:
                 uptimeUnix = float(fp.read())
             uptime = str(datetime.timedelta(seconds=int(round(time.time()-uptimeUnix))))
-            info = "1.2.1"
-            await ctx.send(f"Pong!\n<:satellite:1034018740897075231> `{str(ping_ms)} ms`\nI'm running KaspBot Version: {info}\nUptime: {uptime}")
+            info = settings.getBotVersion()
+            await ctx.send(f"Pong!\n<:satellite:1034018740897075231> `{str(ping_ms)} ms`\n{operationalMessage}\nI'm running KaspBot Version: {info}\nUptime: {uptime}")
 
 
     @commands.command(help="Send the embed for reaction roles. Requires manage_guild", brief="Reaction Roles Embed")
@@ -141,8 +142,6 @@ class Admin(commands.Cog, name="Admin Commands"):
         if ctx.author.guild_permissions.administrator: #type:ignore
             await ctx.author.send(file=discord.File('./logs/log.log'))
             await ctx.author.send(file=discord.File('./logs/log.prev.log'))
-            
-        
 
 async def setup(bot:commands.Bot):
     await bot.add_cog(

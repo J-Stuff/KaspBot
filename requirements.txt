@@ -1,4 +1,4 @@
 requests
-pymongo
 python-dotenv
 discord.py
+tinydb

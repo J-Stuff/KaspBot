@@ -2,14 +2,10 @@ import discord
 from discord.ext import commands
 from modules.logging.adminCommandLogs import adminCommandLogs
 async def warn(interaction:discord.Interaction, target:discord.Member, reason:str, bot:commands.Bot):
-    if not interaction.user.guild_permissions.ban_members: #type:ignore
-        await interaction.response.send_message("You do not have permission to run this!", ephemeral=True)
-        return
-    
     await interaction.response.defer(thinking=True, ephemeral=True)
 
     user_warnEmbed = discord.Embed(title='You have received a Warn!', description=f"You recieved a warn from {interaction.guild.name}") #type:ignore
-    user_warnEmbed.set_author(name=interaction.user.name, icon_url=interaction.user.avatar.url) #type:ignore
+    user_warnEmbed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url) #type:ignore
     user_warnEmbed.add_field(name="Reason", value=reason)
 
     try:

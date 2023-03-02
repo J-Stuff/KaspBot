@@ -4,32 +4,15 @@ import os
 import sys
 import logging
 from modules.logging.userCommandLogs import userCommandLogs
-from config.getSetting import getSetting
+from config.getConfig import settings as unsettings
+settings = unsettings()
 class SpeciesRoles(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
 
-    def getSpeciesDB(self):
-        from pymongo import MongoClient
-        CONNECTION_STRING = os.getenv("MONGO_connection_string")
-        client: MongoClient = MongoClient(CONNECTION_STRING)
-        database = os.getenv("MONGO_maindb")
-        if database == None:
-            logging.info("BAD ENV MONGO_maindb")
-            sys.exit()
-        db = client[database]
-        collection = getSetting(os.getenv("SETTINGS_reactionRolesCollection"))
-        rrCollection = db[collection]
-        result = rrCollection.find_one("speciesRoles")
-        if result == None:
-            logging.info(' result = rrCollection.find_one("speciesRoles") >> result == None!')
-            sys.exit()
-        payload = result["value"]
-        return payload
-
     async def applyRole(self, interaction:discord.Interaction, role:str):
-        targetRoleID = int(self.getSpeciesDB()[role])
+        targetRoleID = int(settings.getReactionRoleID("species", role))
         guild = interaction.guild
         if guild == None:
             logging.info(f"Error: RR00-0 - {role}")
@@ -123,29 +106,9 @@ class ColorRoles(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
-
-    def getColorDB(self):
-        from pymongo import MongoClient
-        CONNECTION_STRING = os.getenv("MONGO_connection_string")
-        client: MongoClient = MongoClient(CONNECTION_STRING)
-        database = os.getenv("MONGO_maindb")
-        if database == None:
-            logging.info("BAD ENV MONGO_maindb")
-            sys.exit()
-        db = client[database]
-        collection = getSetting(os.getenv("SETTINGS_reactionRolesCollection"))
-        rrCollection = db[collection]
-        result = rrCollection.find_one("colorRoles")
-        if result == None:
-            logging.info(' result = rrCollection.find_one("colorRoles") >> result == None!')
-            sys.exit()
-        payload = result["value"]
-        logging.info(payload)
-        return payload
     
     async def applyRole(self, interaction:discord.Interaction, role:str):
-        targetRoleID = int(self.getColorDB()[role])
-        logging.info(targetRoleID)
+        targetRoleID = int(settings.getReactionRoleID("color", role))
         guild = interaction.guild
         if guild == None:
             logging.info(f"Error: RR01-0 - {role}")
@@ -188,7 +151,7 @@ class ColorRoles(discord.ui.View):
 
     @discord.ui.button(label="Teal", custom_id="teal", style=discord.ButtonStyle.blurple)
     async def teal(self, interaction, button):
-        await self.applyRole(interaction, "Teal")
+        await self.applyRole(interaction, "teal")
 
     @discord.ui.button(label="Cyan", custom_id="cyan", style=discord.ButtonStyle.blurple)
     async def cyan(self, interaction, button):
@@ -210,28 +173,10 @@ class SORoles(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
-    
-        
-    def getSoDB(self):
-        from pymongo import MongoClient
-        CONNECTION_STRING = os.getenv("MONGO_connection_string")
-        client: MongoClient = MongoClient(CONNECTION_STRING)
-        database = os.getenv("MONGO_maindb")
-        if database == None:
-            logging.info("BAD ENV MONGO_maindb")
-            sys.exit()
-        db = client[database]
-        collection = getSetting(os.getenv("SETTINGS_reactionRolesCollection"))
-        rrCollection = db[collection]
-        result = rrCollection.find_one("soRoles")
-        if result == None:
-            logging.info(' result = rrCollection.find_one("soRoles") >> result == None!')
-            sys.exit()
-        payload = result["value"]
-        return payload
+
 
     async def applyRole(self, interaction:discord.Interaction, role:str):
-        targetRoleID = int(self.getSoDB()[role])
+        targetRoleID = int(settings.getReactionRoleID("orientation", role))
         guild = interaction.guild
         if guild == None:
             logging.info(f"Error: RR02-0 - {role}")
@@ -284,27 +229,9 @@ class GenderRoles(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
-
-    def getGenderDB(self):
-        from pymongo import MongoClient
-        CONNECTION_STRING = os.getenv("MONGO_connection_string")
-        client: MongoClient = MongoClient(CONNECTION_STRING)
-        database = os.getenv("MONGO_maindb")
-        if database == None:
-            logging.info("BAD ENV MONGO_maindb")
-            sys.exit()
-        db = client[database]
-        collection = getSetting(os.getenv("SETTINGS_reactionRolesCollection"))
-        rrCollection = db[collection]
-        result = rrCollection.find_one("genderRoles")
-        if result == None:
-            logging.info(' result = rrCollection.find_one("genderRoles") >> result == None!')
-            sys.exit()
-        payload = result["value"]
-        return payload
     
     async def applyRole(self, interaction:discord.Interaction, role:str):
-        targetRoleID = int(self.getGenderDB()[role])
+        targetRoleID = int(settings.getReactionRoleID("gender", role))
         guild = interaction.guild
         if guild == None:
             logging.info(f"Error: RR03-0 - {role}")
@@ -346,26 +273,8 @@ class PronounRoles(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    def getGenderDB(self):
-        from pymongo import MongoClient
-        CONNECTION_STRING = os.getenv("MONGO_connection_string")
-        client: MongoClient = MongoClient(CONNECTION_STRING)
-        database = os.getenv("MONGO_maindb")
-        if database == None:
-            logging.info("BAD ENV MONGO_maindb")
-            sys.exit()
-        db = client[database]
-        collection = getSetting(os.getenv("SETTINGS_reactionRolesCollection"))
-        rrCollection = db[collection]
-        result = rrCollection.find_one("pronounRoles")
-        if result == None:
-            logging.info(' result = rrCollection.find_one("pronounRoles") >> result == None!')
-            sys.exit()
-        payload = result["value"]
-        return payload
-    
     async def applyRole(self, interaction:discord.Interaction, role:str):
-        targetRoleID = int(self.getGenderDB()[role])
+        targetRoleID = int(settings.getReactionRoleID("pronoun", role))
         guild = interaction.guild
         if guild == None:
             logging.info(f"Error: RR04-0 - {role}")

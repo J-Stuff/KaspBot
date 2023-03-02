@@ -1,32 +1,20 @@
 import json
-import os
-import sys
 import random
 import discord
 import logging
-from config.getSetting import getSetting
 from discord.ext import commands
 
 async def funStatus(bot:commands.Bot):
-    from pymongo import MongoClient
-    CONNECTION_STRING = os.getenv("MONGO_connection_string")
-    client: MongoClient = MongoClient(CONNECTION_STRING)
-    database = os.getenv("MONGO_maindb")
-    if database == None:
-        logging.info("BAD ENV MONGO_maindb")
-        sys.exit()
-    
-    db = client[database]
+    logging.debug("Rotating bot custom status")
+    logging.debug("Reading status DB")
+    with open("./database/status.json", 'r') as fp:
+        logging.debug("Parsing JSON")
+        statusList = json.load(fp)
+        fp.close()
 
-    collection = getSetting("MONGO_status_collection")
-    if collection == None:
-        logging.info("BAD DB MONGO_verification_collection")
-        sys.exit()
-        
-    statusStore = db[collection]
-    statusMessages = list(statusStore.find({}))
-    
-    newStatus = statusMessages[random.randint(0, (len(statusMessages)-1))]
+    logging.debug("Picking a new status")
+    newStatus = random.choice(statusList)
+    logging.debug(f"Using status: {newStatus}")
 
     if newStatus["type"] == "playing":
         statusMsg = discord.Game(name=newStatus["content"])
@@ -39,4 +27,5 @@ async def funStatus(bot:commands.Bot):
     else:
         statusMsg = discord.Game(name="in a virtual paradise")
 
-    await bot.change_presence(status=discord.Status.online, activity=statusMsg)  # type: ignore
+    logging.debug("Rotating presence now...")
+    await bot.change_presence(status=discord.Status.online, activity=statusMsg)
