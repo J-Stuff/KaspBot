@@ -20,6 +20,6 @@ async def adminCommandLogs(user:discord.User|discord.Member, message:str, channe
     embed.add_field(name="Message", value=message)
     logChannelID = settings.getChannelID("adminLogs")
     logChannel = await bot.fetch_channel(int(logChannelID))
-    if not type(logChannel) == discord.TextChannel:
+    if type(logChannel) is not discord.TextChannel:
         sys.exit("BAD CHANNEL ID FOR: admin_log_channel")
-    await logChannel.send(embed=embed) #type:ignore
+    await logChannel.send(embed=embed)

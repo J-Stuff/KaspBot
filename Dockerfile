@@ -8,7 +8,7 @@ ADD main.py main.py
 
 COPY requirements.txt /tmp/requirements.txt
 
-COPY ./logs/log.log /logging/log.log
+COPY ./logs /logging
 
 COPY . /worker
 WORKDIR /worker

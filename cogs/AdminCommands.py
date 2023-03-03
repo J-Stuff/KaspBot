@@ -1,10 +1,8 @@
 from discord.ext import commands
-from discord import app_commands
 from modules.logging.adminCommandLogs import adminCommandLogs
 from config.getConfig import settings as unsettings
 settings = unsettings()
 import discord
-import os
 import sys
 import json
 import requests
@@ -17,20 +15,7 @@ import asyncio
 class Admin(commands.Cog, name="Admin Commands"):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
-
-    def getCollection(self, collection):
-        from pymongo import MongoClient
-        CONNECTION_STRING = os.getenv("MONGO_connection_string")
-        client: MongoClient = MongoClient(CONNECTION_STRING)
-        database = os.getenv("MONGO_maindb")
-        if database == None:
-            logging.info("BAD ENV MONGO_maindb")
-            sys.exit()
-        db = client[database]
-        return db[collection]
-        
     # =====================
-
     @commands.command(help="Shows the bot ping, version & status.", brief="Bot Status.")
     async def status(self, ctx:commands.Context):
         logging.info("running command status")
@@ -50,7 +35,6 @@ class Admin(commands.Cog, name="Admin Commands"):
             uptime = str(datetime.timedelta(seconds=int(round(time.time()-uptimeUnix))))
             info = settings.getBotVersion()
             await ctx.send(f"Pong!\n<:satellite:1034018740897075231> `{str(ping_ms)} ms`\n{operationalMessage}\nI'm running KaspBot Version: {info}\nUptime: {uptime}")
-
 
     @commands.command(help="Send the embed for reaction roles. Requires manage_guild", brief="Reaction Roles Embed")
     async def sendRRembed(self, ctx: commands.Context):
@@ -90,8 +74,8 @@ class Admin(commands.Cog, name="Admin Commands"):
 
     @commands.command(help="Send the verification embed. Requires: manage_guild", brief="Send Verif Embed")
     async def sendVerEmbed(self, ctx:commands.Context):
-        from modules.utilities.verification import verificationClass
         if ctx.author.guild_permissions.manage_guild: #type:ignore
+            from modules.utilities.verification import verificationClass
             embed = discord.Embed(title="Begin Verification", description="Use the button below to begin Verification!",
                                 color=discord.colour.parse_hex_number("00a83d"))
             await ctx.send(embed=embed, view=verificationClass(self.bot))

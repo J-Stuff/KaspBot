@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import os
 import sys
 import logging
 from modules.logging.userCommandLogs import userCommandLogs

@@ -1,14 +1,10 @@
+import discord, time, datetime, os, asyncio, logging, random
 from discord.ext import commands
-import discord
-import os
 from discord import app_commands
 from config.getConfig import settings as preSettings
 from modules.logging.userCommandLogs import userCommandLogs
 from modules.logging.adminCommandLogs import adminCommandLogs
-import logging
-import random
 settings = preSettings()
-
 
 class adminSlash(commands.Cog, name="Admin Slash Commands"):
     def __init__(self, bot:commands.Bot):
@@ -31,33 +27,215 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
 
     @app_commands.command(name="verify", description="Verify a user!")
     @app_commands.checks.has_permissions(manage_roles=True)
-    async def verifyUser(self, interaction, target: discord.Member):
-        from modules.utilities.verification import user_verf
-        await user_verf(interaction, target, self.bot)
+    async def verifyUser(self, interaction:discord.Interaction, target: discord.Member):
+
+        # -----------------------------------------------------
+        async def giveVerRole(interaction:discord.Interaction):
+            guild = interaction.guild
+            if guild == None:
+                await interaction.response.send_message("FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`giveVerRole - guild == None`\n0", ephemeral=True)
+                return
+            
+
+            memberRole = guild.get_role(int(settings.getMiscId("memberRole")))
+            unv_role = guild.get_role(int(settings.getMiscId("unverifiedID")))        
+            updatedTarget = await guild.fetch_member(target.id)
+
+            if memberRole in updatedTarget.roles: 
+                await interaction.response.send_message(f"User is already verified!", ephemeral=True)
+                return
+            
+            await interaction.response.defer(ephemeral=True, thinking=True)
+
+            embedLoad = discord.Embed(
+                title="Verification", color=discord.colour.parse_hex_number("ffcc00"))
+            embedLoad.add_field(
+                name="Adding Roles", value="Please wait...")
+            loader:discord.Message = await interaction.followup.send(embed=embedLoad, ephemeral=True, wait=True)
+
+            if not memberRole:
+                await interaction.followup.edit_message(message_id=loader.id, content="FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`giveVerRole - if not unv_role`\n0")
+                return
+            if not unv_role:
+                await interaction.followup.edit_message(message_id=loader.id, content="FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`giveVerRole - if not ver_role`\n0")
+                return
+            
+
+            await target.add_roles(memberRole)
+            try:
+                await target.remove_roles(unv_role)
+            except discord.HTTPException:
+                logging.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
+            
+            await adminCommandLogs(interaction.user, f"/verify\nVerified <@{target.id}> (`{target}` // `{target.id}`)!", interaction.channel, self.bot)
+            try:
+                await target.send(f"Your verification request in {target.guild.name} was accepted. Welcome!")
+            except discord.Forbidden:
+                logging.error(f"Failed to notify {updatedTarget.id} they they have passed verification. They probably have their DM's off.")
+            embedDone = discord.Embed(
+                title="Verification", color=discord.colour.parse_hex_number("289100"))
+            embedDone.add_field(name="Verification Complete",
+                                value=f"Welcome, <@{target.id}>!")
+            embedDone.set_author(name=interaction.user,
+                                icon_url=interaction.user.avatar)
+            await interaction.followup.edit_message(message_id=loader.id, embed=embedDone)
+
+        # ---------------------------------------------------------------------------------
+
+        embed = discord.Embed(title="Verification Interface",
+                            description=f"Information about: {target}")
+        accountCreation = target.created_at
+        accountUnix = int(time.mktime(accountCreation.timetuple()))
+        embed.add_field(name="Account Created",
+                        value=f"<t:{accountUnix}:F>\nWhich was: <t:{accountUnix}:R>", inline=False)
+        embed.add_field(
+            name='To cancel', value="To cancel this operation, simply ignore this embed and hit 'dismiss message' below", inline=False)
+
+        verifyButton = discord.ui.Button(
+            label="Verify User", style=discord.ButtonStyle.green)
+        verifyButton.callback = giveVerRole
+        view = discord.ui.View()
+        view.add_item(verifyButton)
+
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
     @app_commands.command(name="unverified-scan", description="Scan and update the User Registry")
     @app_commands.checks.has_permissions(manage_messages=True)
-    async def unvScan(self, interaction):
-        from modules.utilities.verification import unv_scan
-        await unv_scan(interaction, self.bot)
+    async def unvScan(self, interaction:discord.Interaction):
+        await interaction.response.defer(ephemeral=False, thinking=True)
+
+        guild = interaction.guild
+        if not guild:
+            return
+        members = guild.members
+        for member in members:
+            member: discord.Member
+            if len(member.roles) == 1:
+                unv_role = guild.get_role(int(settings.getMiscId("unverifiedID")))  
+                if not unv_role:
+                    await interaction.response.send_message("FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`unv_scan - if not unv_role`\n0")
+                    return
+                await member.add_roles(unv_role)
+        await interaction.followup.send("Done! Updated the User Verification Registry")
+        await adminCommandLogs(interaction.user, f"Ran /unverified-scan", interaction.channel, self.bot)
 
     @app_commands.command(name='ticket-close', description="Close a ticket")
     @app_commands.checks.has_permissions(manage_messages=True)
-    async def do_CloseTicket(self, interaction, ticket: discord.TextChannel):
-        from modules.utilities.modTickets import closeTicket
-        await closeTicket(interaction, ticket, self.bot)
+    async def do_CloseTicket(self, interaction:discord.Interaction, ticket: discord.TextChannel):
+        # ------------------------------------------------------------------------------------
+        async def ticketLog(messages, closedBy:discord.User|discord.Member, bot:commands.Bot):
+            fileID = str(random.randint(1111, 9999))
+            with open(f'./temp/{fileID}.txt', 'a') as fp:
+                now = datetime.datetime.utcnow()
+                dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                fp.write(f"Closed at: {dt_string} UTC")
+                fp.write('\n')
+                fp.write(f"Closed by user: {closedBy} ({closedBy.id})")
+                fp.write('\n')
+                fp.write('======================================================')
+                fp.write('\n')
+                fp.write('\n')
+                async for line in messages:
+                    if not line.author == bot.user:
+                        sentAt = line.created_at 
+                        sent_timeStamp = sentAt.strftime("%d/%m/%Y %H:%M:%S")
+                        fp.write(f"Author: {line.author} ({line.author.id}) // At: {sent_timeStamp} | Content: {line.content}")
+                        fp.write('\n')
+            logChannel = bot.get_channel(int(settings.getChannelID("ticketLogs")))
+            embed = discord.Embed(title="A ticket was closed", color=discord.colour.parse_hex_number("0099ff"))
+            unix = int(time.time())
+            embed.add_field(name="Closed on:", value=f"<t:{unix}:F>\n(<t:{unix}:R>)")
+            embed.add_field(name="Closed by:", value=closedBy.mention)
+            await logChannel.send(embed=embed, file=discord.File(f"./temp/{fileID}.txt")) #type:ignore
+            time.sleep(1)
+            os.remove(f"./temp/{fileID}.txt")
+        # ----------------------------------
+
+        channel = ticket
+        from tinydb import TinyDB, Query
+        db = TinyDB('./database/tickets.json')
+        User = Query()
+        if channel.name.startswith("ticket-"):
+            await interaction.response.defer(ephemeral=False, thinking=True)
+            db.update({"active": False}, User.tid == str(channel.id))
+            db.close()
+            ticketMessages = channel.history(oldest_first=True)
+            await ticketLog(ticketMessages, interaction.user, self.bot)
+            await channel.delete(reason="Admin Closed this ticket!")
+            await adminCommandLogs(interaction.user, f"CLOSED TICKET: {channel.name}", channel, self.bot)
+        else:
+            await interaction.response.send_message("That is not a ticket channel!", ephemeral=True)
 
     @app_commands.command(name="warn", description="Warn a user")
     @app_commands.checks.has_permissions(ban_members=True)
     async def do_warn(self, interaction:discord.Interaction, user:discord.Member, reason:str):
-        from modules.utilities.warn import warn
-        await warn(interaction, user, reason, self.bot)
+        guild = interaction.guild
+        if not guild:
+            return
+        await interaction.response.defer(thinking=True, ephemeral=True)
+        user_warnEmbed = discord.Embed(title='You have received a Warn!', description=f"You recieved a warn from {guild.name}")
+        user_warnEmbed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
+        user_warnEmbed.add_field(name="Reason", value=reason)
+
+        try:
+            await user.send(embed=user_warnEmbed)
+        except discord.Forbidden:
+            await interaction.followup.send("This user either has blocked me, or has their DM's disabled for this server!\nI cannot send a message to them.", ephemeral=True)
+        except:
+            await interaction.followup.send("This user either has blocked me, or has their DM's disabled for this server!", ephemeral=True)
+        else:
+            await interaction.followup.send("Done!, I sent the user the following message:", embed=user_warnEmbed, ephemeral=True)
+            await adminCommandLogs(interaction.user, f"Warned User: {user}, for {reason}", interaction.channel, self.bot)
 
     @app_commands.command(name="unverified-kick", description="Run the kick operation for unverified users")
     @app_commands.checks.has_permissions(administrator=True)
     async def do_unverifiedKick(self, interaction:discord.Interaction):
-        from modules.utilities.verification import unverifiedKick
-        await unverifiedKick(interaction, self.bot)
+        logging.debug("Running unverifiedKick")
+        confirm = random.randint(111, 999)
+        logging.debug(f"Confirm code is: {confirm}")
+        confirmEmbed = discord.Embed(title="Warning!!!", 
+                                    description=f"The action you are about to take is **Destructive**\n\nYou are about to kick all unverified members, that have been in the server for more than 14 days.\n\nDo you understand that after starting this action, that it cannot be stopped until complete?\n\nType the following code within 20 seconds to confirm. Or wait for 20 seconds to cancel. \n`{confirm}`",
+                                    color=discord.colour.parse_hex_number("ff0000"))
+        await interaction.response.send_message(embed=confirmEmbed)
+        def check(m:discord.Message):
+            logging.debug(f"Testing to see if response matches challange code || Challenge code: {confirm} // Response: {m.content}")
+            return m.content == str(confirm) and m.author == interaction.user
+        try:
+            response = await self.bot.wait_for("message", check=check, timeout=20)
+        except asyncio.TimeoutError:
+            await interaction.followup.send("Timeout passed. Command aborted!")
+            logging.debug("Challenge Timed out!")
+            return
+        else:
+            await interaction.followup.send("Authenticated!")
+            logging.debug("Challenge passed!")
+            
+            # ==========================================================
+
+            if interaction.guild == None:
+                logging.fatal("Yeah, something majorly fucked up") # https://discord.com/channels/1038438846104338473/1038438847534600255/1080791479544451132
+                return
+            
+            unverifiedRole = interaction.guild.get_role(int(settings.getMiscId("memberRole")))
+            verifiedRole = interaction.guild.get_role(int(settings.getMiscId("unverifiedID")))
+            async for user in interaction.guild.fetch_members(limit=None):
+                logging.debug(user)
+                if unverifiedRole in user.roles and verifiedRole not in user.roles:
+                    logging.debug("is unverified")
+                    logging.debug(user.joined_at)
+                    joined = user.joined_at
+                    if not joined:
+                        continue
+                    if joined - datetime.timedelta(days=14) == 0:
+                        logging.debug("is over 2 weeks, kicking!")
+                        await interaction.followup.send(f"Kicking {user.name}", ephemeral=True)
+                        await user.kick(reason="Kicked due to unverified scan!")
+                        await interaction.followup.send(f"Kicked {user.mention} // Reason: Kicked due to unverified scan", ephemeral=True)
+                        await adminCommandLogs(interaction.user, f"Kicked {user.mention} during unverified purge", interaction.channel, self.bot) 
+                else:
+                    logging.debug("is clear")
+
+            await interaction.followup.send("All done!")
 
     async def cog_app_command_error(
         self,
@@ -79,8 +257,10 @@ class userSlash(commands.Cog, name="User Slash Commands"):
             boop = random.choice(boopList)
             await userCommandLogs(interaction.user, f"/boop on {user.mention}", interaction.channel, self.bot)
             await interaction.response.send_message(f"{interaction.user.mention} *boops* {user.mention}")
-            await interaction.channel.send(boop) #type:ignore
-
+            channel = interaction.channel
+            if not channel or type(channel) is not discord.TextChannel:
+                return
+            await channel.send(boop)
 
     async def cog_app_command_error(
         self,
@@ -89,7 +269,6 @@ class userSlash(commands.Cog, name="User Slash Commands"):
     ):
         from modules.botMaintenance.appCommand_Errors import appCommand_Error
         await appCommand_Error(interaction, error, self.bot)
-
 
 
 async def setup(bot: commands.Bot):
