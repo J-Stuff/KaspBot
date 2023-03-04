@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.utils import format_dt
 from config.getConfig import settings as unsettings
 settings = unsettings()
+from logging.adminCommandLogs import adminCommandLogs
 
 class verificationQuestionare(discord.ui.Modal, title='Verification', ):
     def __init__(self, bot:commands.Bot):
@@ -27,6 +28,12 @@ class verificationNotify():
     def __init__(self, bot:commands.Bot):
             super().__init__()
             self.bot = bot
+
+    class verifyButton(discord.ui.Button):
+        def __init__(self):
+            super().__init__(label="[Admin] Verify", style=discord.ButtonStyle.green,)
+
+    
     
     async def notify(self, q1, q2, q3, interaction:discord.Interaction, sender:int):
         verificationNotificationChannel = settings.getChannelID("verificationNotif")
@@ -42,10 +49,67 @@ class verificationNotify():
         embed.add_field(name="Response 2: How did you get invited to this discord server?", value=q2, inline=False)
         embed.add_field(name="Response 3: Have you read and agree to the rules listed in the Rules Channel?", value=q3, inline=False)
         embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
-        whoIs = discord.ui.Button(style=discord.ButtonStyle.green, label="Profile", url=f"discord://-/users/{sender}")
+        whoIs = discord.ui.Button(style=discord.ButtonStyle.gray, label="Profile", url=f"discord://-/users/{sender}")
         view = discord.ui.View()
+        verifyButton = self.verifyButton()
+        view.add_item(verifyButton)
         view.add_item(whoIs)
-        await notifyChannel.send(embed=embed, view=view)        
+
+        async def giveVerRole(interaction:discord.Interaction):
+            if not interaction.user.guild_permissions.manage_roles: #type:ignore
+                await interaction.response.send_message("You don't have permission to do this!", ephemeral=True)
+                return
+            guild = interaction.guild
+            if guild == None:
+                await interaction.response.send_message("FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`giveVerRole - guild == None`\n0", ephemeral=True)
+                return
+            
+
+            memberRole = guild.get_role(int(settings.getMiscId("memberRole")))
+            unv_role = guild.get_role(int(settings.getMiscId("unverifiedID")))        
+            updatedTarget = await guild.fetch_member(sender)
+
+            if memberRole in updatedTarget.roles: 
+                await interaction.response.send_message(f"User is already verified!", ephemeral=True)
+                return
+            
+            await interaction.response.defer(ephemeral=True, thinking=True)
+
+            embedLoad = discord.Embed(
+                title="Verification", color=discord.colour.parse_hex_number("ffcc00"))
+            embedLoad.add_field(
+                name="Adding Roles", value="Please wait...")
+            loader:discord.Message = await interaction.followup.send(embed=embedLoad, ephemeral=True, wait=True)
+
+            if not memberRole:
+                await interaction.followup.edit_message(message_id=loader.id, content="FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`giveVerRole - if not unv_role`\n0")
+                return
+            if not unv_role:
+                await interaction.followup.edit_message(message_id=loader.id, content="FAILURE <!>\nReport this NOW (Screenshot me! WIN KEY + Shift + S)\n`giveVerRole - if not ver_role`\n0")
+                return
+            
+
+            await updatedTarget.add_roles(memberRole)
+            try:
+                await updatedTarget.remove_roles(unv_role)
+            except discord.HTTPException:
+                logging.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
+            
+            await adminCommandLogs(interaction.user, f"/verify\nVerified <@{sender}> (`{sender}`)!", interaction.channel, self.bot)
+            try:
+                await updatedTarget.send(f"Your verification request in {guild.name} was accepted. Welcome!")
+            except discord.Forbidden:
+                logging.error(f"Failed to notify {updatedTarget.id} they they have passed verification. They probably have their DM's off.")
+            embedDone = discord.Embed(
+                title="Verification", color=discord.colour.parse_hex_number("289100"))
+            embedDone.add_field(name="Verification Complete",
+                                value=f"Welcome, <@{sender}>!")
+            embedDone.set_author(name=interaction.user,
+                                icon_url=interaction.user.avatar)
+            await interaction.followup.edit_message(message_id=loader.id, embed=embedDone)
+
+        verifyButton.callback = giveVerRole
+        await notifyChannel.send(embed=embed, view=view)
 class verificationClass(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)

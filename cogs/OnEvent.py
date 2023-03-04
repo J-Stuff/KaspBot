@@ -23,6 +23,8 @@ class Listeners(commands.Cog, name="On Event Listeners"):
             return
         if message.author.id == botUser.id or message.content == None:
             return
+        if type(message.channel) == discord.DMChannel:
+            return
         unix = int(time.time())
         embed = discord.Embed(title="A message was Deleted!",
                             description=f"Deleted in: <#{message.channel.id}>\nAt <t:{unix}:T>", color=discord.colour.parse_hex_number("ff0000"))
@@ -48,6 +50,8 @@ class Listeners(commands.Cog, name="On Event Listeners"):
         if not botUser:
             return
         if message_before.author.id == botUser.id or message_after.content == message_before.content:
+            return
+        if type(message_before.channel) == discord.DMChannel:
             return
         unix = int(time.time())
         embed = discord.Embed(title="A message was Edited!",
@@ -75,6 +79,10 @@ class Listeners(commands.Cog, name="On Event Listeners"):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
+        if type(message.channel) == discord.DMChannel:
+            await message.channel.send("I do not respond to messages sent in my DM's!\nIf you need to contact a moderator, please create a ticket!")
+            return
+
         await self.checkIfPinged(message)
 
     @commands.Cog.listener()
