@@ -2,6 +2,7 @@ from discord.ext import commands
 import time
 import discord
 import logging
+from tinydb import TinyDB, Query
 from config.getConfig import settings as unsettings
 settings = unsettings()
 
@@ -79,10 +80,6 @@ class Listeners(commands.Cog, name="On Event Listeners"):
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
-        if type(message.channel) == discord.DMChannel:
-            await message.channel.send("I do not respond to messages sent in my DM's!\nIf you need to contact a moderator, please create a ticket!")
-            return
-
         await self.checkIfPinged(message)
 
     @commands.Cog.listener()
@@ -124,6 +121,10 @@ class Listeners(commands.Cog, name="On Event Listeners"):
         if type(logChannel) is not discord.TextChannel:
             return
         await logChannel.send(embed=userLeftEmbed)
+        db = TinyDB('./database/verification.json')
+        User = Query()
+        result = db.remove(User.id == str(user.id))
+
     
     @commands.Cog.listener()
     async def on_ready(self):

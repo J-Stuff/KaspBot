@@ -1,13 +1,13 @@
 import discord
 import sys
-import datetime
+import time
 import logging
 from tinydb import TinyDB, Query
 from discord.ext import commands
 from discord.utils import format_dt
 from config.getConfig import settings as unsettings
 settings = unsettings()
-from logging.adminCommandLogs import adminCommandLogs
+from modules.logging.adminCommandLogs import adminCommandLogs
 
 class verificationQuestionare(discord.ui.Modal, title='Verification', ):
     def __init__(self, bot:commands.Bot):
@@ -22,7 +22,7 @@ class verificationQuestionare(discord.ui.Modal, title='Verification', ):
         db = TinyDB('./database/verification.json')
         db.insert({"id": str(interaction.user.id)})
         verif = verificationNotify(self.bot)
-        await verif.notify(interaction=interaction, q1=self.whyJoin, q2=self.howInvite, q3=self.rulesAgreement, sender=interaction.user.id)
+        await verif.notify(interaction1=interaction, q1=self.whyJoin, q2=self.howInvite, q3=self.rulesAgreement, sender=interaction.user.id)
         await interaction.response.send_message("Thanks for your response. I've recorded your answers and sent a notification to the moderators who will review your response and verify your account if you meet our requirements. I'll DM you when that happens!", ephemeral=True)
 class verificationNotify():
     def __init__(self, bot:commands.Bot):
@@ -35,7 +35,7 @@ class verificationNotify():
 
     
     
-    async def notify(self, q1, q2, q3, interaction:discord.Interaction, sender:int):
+    async def notify(self, q1, q2, q3, interaction1:discord.Interaction, sender:int):
         verificationNotificationChannel = settings.getChannelID("verificationNotif")
         if verificationNotificationChannel == None:
             logging.info("BAD SETTING verificationNotificationChannel")
@@ -44,11 +44,11 @@ class verificationNotify():
         if notifyChannel == None or type(notifyChannel) is not discord.TextChannel :
             logging.info("BAD SETTING verificationNotificationChannel")
             sys.exit()
-        embed = discord.Embed(title="Verification Request", description=f"Account created {format_dt(interaction.user.created_at, 'D')} @ {format_dt(interaction.user.created_at, 'T')}\n(Which was: {format_dt(interaction.user.created_at, 'R')})", color=discord.colour.parse_hex_number("22942f"))
+        embed = discord.Embed(title="Verification Request", description=f"Account created {format_dt(interaction1.user.created_at, 'D')} @ {format_dt(interaction1.user.created_at, 'T')}\n(Which was: {format_dt(interaction1.user.created_at, 'R')})", color=discord.colour.parse_hex_number("22942f"))
         embed.add_field(name="Response 1: Why do you want to join our server?", value=q1, inline=False)
         embed.add_field(name="Response 2: How did you get invited to this discord server?", value=q2, inline=False)
         embed.add_field(name="Response 3: Have you read and agree to the rules listed in the Rules Channel?", value=q3, inline=False)
-        embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
+        embed.set_author(name=interaction1.user.name, icon_url=interaction1.user.display_avatar.url)
         whoIs = discord.ui.Button(style=discord.ButtonStyle.gray, label="Profile", url=f"discord://-/users/{sender}")
         view = discord.ui.View()
         verifyButton = self.verifyButton()
@@ -71,6 +71,8 @@ class verificationNotify():
 
             if memberRole in updatedTarget.roles: 
                 await interaction.response.send_message(f"User is already verified!", ephemeral=True)
+                verifyButton.disabled = True
+                await notification.edit(view=view)
                 return
             
             await interaction.response.defer(ephemeral=True, thinking=True)
@@ -107,9 +109,11 @@ class verificationNotify():
             embedDone.set_author(name=interaction.user,
                                 icon_url=interaction.user.avatar)
             await interaction.followup.edit_message(message_id=loader.id, embed=embedDone)
+            verifyButton.disabled = True
+            await notification.edit(view=view)
 
         verifyButton.callback = giveVerRole
-        await notifyChannel.send(embed=embed, view=view)
+        notification = await notifyChannel.send(embed=embed, view=view)
 class verificationClass(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
@@ -119,21 +123,20 @@ class verificationClass(discord.ui.View):
         db = TinyDB('./database/verification.json')
         User = Query()
         result = db.search(User.id == id)
-        if len(result) is not 0:
+        if len(result) != 0:
             return True
         else:
             return False
 
     @discord.ui.button(label="Request Verification!", custom_id="VerificationInteraction", style=discord.ButtonStyle.green)
     async def verificationButton(self, interaction:discord.Interaction, button):
-        now = datetime.datetime.now()
-        created = interaction.user.created_at
-        elapsed = now - created
+        createdDT = interaction.user.created_at
+        created = int(createdDT.timestamp())
         if self.checkForUser(str(interaction.user.id)) == True:
             await interaction.response.send_message("You have already sent in a request for verification!", ephemeral=True)
             return
-        elif elapsed.days < 7:
-            await interaction.response.send_message("Your account is too young! Please wait until your account is at least 7 days old before verifying.")
+        elif int(time.time()) - created < 604800:
+            await interaction.response.send_message("Your account is too young! Please wait until your account is at least 7 days old before verifying.", ephemeral=True)
             return
         else:
             await interaction.response.send_modal(verificationQuestionare(self.bot))

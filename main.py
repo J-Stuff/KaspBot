@@ -15,6 +15,9 @@ except:
     pass
 open('./database/cogs.db', 'w').close()
 
+if os.path.exists('./.env'):
+    dotenv.load_dotenv('./.env')
+
 logging.basicConfig(filename='./logs/log.log', encoding='utf-8', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)-8s %(message)s')
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
 stream_handler = logging.StreamHandler()

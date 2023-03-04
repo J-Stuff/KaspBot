@@ -301,7 +301,7 @@ class userSlash(commands.Cog, name="User Slash Commands"):
                 return
             await channel.send(boop)
 
-    @app_commands.command(name="whois", description="Look up a user")
+    @app_commands.command(name="lookup", description="Look up a user")
     @app_commands.checks.cooldown(3, 120, key=lambda i: (i.guild_id, i.user.id))
     async def lookup(self, interaction:discord.Interaction, target:discord.User|discord.Member):
         guild = interaction.guild
@@ -317,13 +317,16 @@ class userSlash(commands.Cog, name="User Slash Commands"):
             embed = discord.Embed(title="User Lookup:", description=f"I found {user.display_name}!", timestamp=datetime.datetime.now(), color=discord.colour.parse_hex_number("fcfcfc"))
         else:
             embed = discord.Embed(title="User Lookup:", description=f"I found {user.display_name}!\nHowever, They are not in this server so I'll only have limited information.", timestamp=datetime.datetime.now(), color=discord.colour.parse_hex_number("fcfcfc"))
-        embed.add_field(name="User info:", value=f"Username: **-** `{user.name}{user.discriminator}\nAccount Created: **-** {format_dt(user.created_at, 'D')} @ {format_dt(user.created_at, 'T')}`\nUser Avatar: [LINK]({user.display_avatar.url})")
+        embed.add_field(name="User info:", value=f"Username: **-** `{user.name}#{user.discriminator}`\nAccount Created: **-** {format_dt(user.created_at, 'D')} @ {format_dt(user.created_at, 'T')}\nUser Avatar **-** [LINK]({user.display_avatar.url})", inline=False)
         if member:
-            embed.add_field(name="Status", value=member.raw_status)
             roleStr = ""
             for role in member.roles:
                 roleStr += f"{role.mention} "
-            embed.add_field(name="Roles", value=roleStr)
+            embed.add_field(name="Roles", value=roleStr, inline=False)
+            joined = member.joined_at
+            if not joined:
+                return
+            embed.add_field(name="Joined Server", value=format_dt(joined, "D") + " // " + format_dt(joined, "R"))
         await interaction.response.send_message(embed=embed)
         
 
@@ -348,7 +351,7 @@ async def setup(bot: commands.Bot):
         guild=discord.Object(int(guildID))
     )
     logging.info("Syncing tree...")
-    sync = await bot.tree.sync()
+    sync = await bot.tree.sync(guild=discord.Object(int(guildID)))
     logging.info(str(sync))
     logging.info("Sync of tree complete!")
     logging.info(f"{__file__} - Done!")

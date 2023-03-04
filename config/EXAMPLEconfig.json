@@ -1,0 +1,78 @@
+{
+    "botSettings": {
+        "DEPRECATED-token-DEPRECATED": "DEPRECATED! Use an ENV called 'discord_token'",
+        "botVersion": "1.2.2"
+    },
+
+    "channelIds": {
+        "verificationNotif": null,
+        "adminLogs": null,
+        "messageLogs": null,
+        "ticketLogs": null,
+        "commandLogs": null,
+        "accountLogs": null,
+        "reportCATEGORY": null
+    },
+
+    "miscIds": {
+        "memberRole": null,
+        "unverifiedID": null,
+        "guildID": null,
+        "reportPing": [
+            null,
+            null
+        ]
+    },
+
+    "reactionRoles": {
+        "color":{
+            "red": null,
+            "orange": null,
+            "yellow": null,
+            "green": null,
+            "teal": null,
+            "cyan": null,
+            "blue": null,
+            "purple": null,
+            "pink": null
+        },
+        "pronoun":{
+            "he": null,
+            "she": null,
+            "they": null,
+            "any": null,
+            "other": null
+        },
+        "orientation":{
+            "straight": null,
+            "gay": null,
+            "lesbian": null,
+            "bisexual": null,
+            "pansexual": null,
+            "asexual": null
+        },
+        "gender":{
+            "male": null,
+            "female": null,
+            "nonbinary": null
+        },
+        "species":{
+            "avian": null,
+            "bear": null,
+            "canine": null,
+            "deer": null,
+            "derg": null,
+            "dragon": null,
+            "feline": null,
+            "fox": null,
+            "hobkin": null,
+            "kobold": null,
+            "moth": null,
+            "otter": null,
+            "protogen": null,
+            "shark": null,
+            "skulldog": null,
+            "wickerbeast": null
+        }
+    }
+}

@@ -8,7 +8,7 @@ class settings():
         with open('./config/config.json', 'r') as fp:
             x = json.load(fp)
             fp.close()
-        logging.debug(x)
+        # logging.debug(x)
         return x
 
 
