@@ -1,10 +1,6 @@
 import discord
-import time
-import os
 import sys
 import datetime
-import random
-import asyncio
 import logging
 from tinydb import TinyDB, Query
 from discord.ext import commands
@@ -26,14 +22,14 @@ class verificationQuestionare(discord.ui.Modal, title='Verification', ):
         db = TinyDB('./database/verification.json')
         db.insert({"id": str(interaction.user.id)})
         verif = verificationNotify(self.bot)
-        await verif.notify(interaction=interaction, q1=self.whyJoin, q2=self.howInvite, q3=self.rulesAgreement)
+        await verif.notify(interaction=interaction, q1=self.whyJoin, q2=self.howInvite, q3=self.rulesAgreement, sender=interaction.user.id)
         await interaction.response.send_message("Thanks for your response. I've recorded your answers and sent a notification to the moderators who will review your response and verify your account if you meet our requirements. I'll DM you when that happens!", ephemeral=True)
 class verificationNotify():
     def __init__(self, bot:commands.Bot):
             super().__init__()
             self.bot = bot
     
-    async def notify(self, q1, q2, q3, interaction:discord.Interaction):
+    async def notify(self, q1, q2, q3, interaction:discord.Interaction, sender:int):
         verificationNotificationChannel = settings.getChannelID("verificationNotif")
         if verificationNotificationChannel == None:
             logging.info("BAD SETTING verificationNotificationChannel")
@@ -47,11 +43,14 @@ class verificationNotify():
         embed.add_field(name="Response 2: How did you get invited to this discord server?", value=q2, inline=False)
         embed.add_field(name="Response 3: Have you read and agree to the rules listed in the Rules Channel?", value=q3, inline=False)
         embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
-        await notifyChannel.send(embed=embed)
+        whoIs = discord.ui.Button(style=discord.ButtonStyle.green, label="WhoIS", url=f"discord://-/users/{sender}")
+        view = discord.ui.View()
+        view.add_item(whoIs)
+        await notifyChannel.send(embed=embed, view=view)        
 class verificationClass(discord.ui.View):
     def __init__(self, bot):
-            super().__init__(timeout=None)
-            self.bot = bot
+        super().__init__(timeout=None)
+        self.bot = bot
 
     def checkForUser(self, id:str):
         db = TinyDB('./database/verification.json')

@@ -1,6 +1,7 @@
-import discord, time, datetime, os, asyncio, logging, random
+import discord, time, datetime, os, asyncio, logging, random, sys
 from discord.ext import commands
 from discord import app_commands
+from discord.utils import format_dt
 from config.getConfig import settings as preSettings
 from modules.logging.userCommandLogs import userCommandLogs
 from modules.logging.adminCommandLogs import adminCommandLogs
@@ -8,21 +9,59 @@ settings = preSettings()
 
 class adminSlash(commands.Cog, name="Admin Slash Commands"):
     def __init__(self, bot:commands.Bot):
+        logging.debug("adminSlash init ran")
         self.bot = bot
 
     @app_commands.command(name="purge", description="Allows an admin to purge the chat")
     @app_commands.checks.has_permissions(manage_messages=True)
     async def purgeChat(self, interaction:discord.Interaction, count: int):
+        logging.debug("Purge Ran")
         channel = interaction.channel
         if not channel:
             logging.fatal("Channel is None in purge, Failing!")
             return
         if type(channel) is not discord.TextChannel:
-            logging.info("Channel is not textchannel when purge called. Failing")
+            logging.info("Channel is not textchannel when purge called. Failing!")
             return
         await interaction.response.defer(ephemeral=False, thinking=True)
-        await channel.purge(limit=count)
+        logging.debug("Interaction Deferred")
+        logging.debug("Beginning purge...")
+        purged = await channel.purge(limit=count)
+        logging.debug("Purge complete!")
+        logging.debug("Logging purge content...")
+        with open('./temp/PURGE.txt', 'w') as fp:
+            now = datetime.datetime.utcnow()
+            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+            fp.write(f"Purged at: {dt_string} UTC")
+            fp.write('\n')
+            fp.write(f"Purged by user: {interaction.user} ({interaction.user.id})")
+            fp.write('\n')
+            fp.write('======================================================')
+            fp.write('\n')
+            fp.write('\n')
+            for message in purged:
+                sentAt = message.created_at 
+                sent_timeStamp = sentAt.strftime("%d/%m/%Y %H:%M:%S")
+                fp.write(f"Author: {message.author} ({message.author.id}) // At: {sent_timeStamp} | Content: {message.content} | Attachments: {message.attachments}")
+        logging.debug("Logging of purged content complete!")
+
+
+        logChannelID = settings.getChannelID("adminLogs")
+        logChannel = await self.bot.fetch_channel(int(logChannelID))
+        if type(logChannel) is not discord.TextChannel:
+            sys.exit("BAD CHANNEL ID FOR: admin_log_channel")
+        
+        logging.debug("Sending purge log!")
+        await logChannel.send("Purge log", file=discord.File('./temp/PURGE.txt'))
+        logging.debug("Sent purge log")
+
+        logging.debug("Removing purge file...")
+        os.remove("./temp/PURGE.txt")
+        logging.debug("Removed purge file")
+
+        logging.debug("Sending purge confirmation...")
         await channel.send(f"Done! Purged `{count}` messages!")
+        logging.debug("Sending Admin Log of purge event...")
         await adminCommandLogs(interaction.user, f"Purged {count} messages!", interaction.channel, self.bot)
 
     @app_commands.command(name="verify", description="Verify a user!")
@@ -261,6 +300,32 @@ class userSlash(commands.Cog, name="User Slash Commands"):
             if not channel or type(channel) is not discord.TextChannel:
                 return
             await channel.send(boop)
+
+    @app_commands.command(name="whois", description="Look up a user")
+    @app_commands.checks.cooldown(3, 120, key=lambda i: (i.guild_id, i.user.id))
+    async def lookup(self, interaction:discord.Interaction, target:discord.User|discord.Member):
+        guild = interaction.guild
+        if not guild:
+            return
+        user:discord.User = await self.bot.fetch_user(target.id)
+        try:
+            member = await guild.fetch_member(target.id)
+        except discord.NotFound:
+            member = None
+        
+        if member:
+            embed = discord.Embed(title="User Lookup:", description=f"I found {user.display_name}!", timestamp=datetime.datetime.now(), color=discord.colour.parse_hex_number("fcfcfc"))
+        else:
+            embed = discord.Embed(title="User Lookup:", description=f"I found {user.display_name}!\nHowever, They are not in this server so I'll only have limited information.", timestamp=datetime.datetime.now(), color=discord.colour.parse_hex_number("fcfcfc"))
+        embed.add_field(name="User info:", value=f"Username: **-** `{user.name}{user.discriminator}\nAccount Created: **-** {format_dt(user.created_at, 'D')} @ {format_dt(user.created_at, 'T')}`\nUser Avatar: [LINK]({user.display_avatar.url})")
+        if member:
+            embed.add_field(name="Status", value=member.raw_status)
+            roleStr = ""
+            for role in member.roles:
+                roleStr += f"{role.mention} "
+            embed.add_field(name="Roles", value=roleStr)
+        await interaction.response.send_message(embed=embed)
+        
 
     async def cog_app_command_error(
         self,
