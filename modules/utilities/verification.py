@@ -43,7 +43,6 @@ class verificationNotify():
         embed.add_field(name="Response 3: Have you read and agree to the rules listed in the Rules Channel?", value=q3, inline=False)
         embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
         whoIs = discord.ui.Button(style=discord.ButtonStyle.green, label="Profile", url=f"discord://-/users/{sender}")
-        
         view = discord.ui.View()
         view.add_item(whoIs)
         await notifyChannel.send(embed=embed, view=view)        
