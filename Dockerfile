@@ -10,6 +10,10 @@ COPY requirements.txt /tmp/requirements.txt
 
 COPY ./logs /logging
 
+COPY ./config /config
+
+COPY ./database /database
+
 COPY . /worker
 WORKDIR /worker
 
