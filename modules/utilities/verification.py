@@ -4,7 +4,6 @@ import datetime
 import logging
 from tinydb import TinyDB, Query
 from discord.ext import commands
-from modules.logging.adminCommandLogs import adminCommandLogs
 from discord.utils import format_dt
 from config.getConfig import settings as unsettings
 settings = unsettings()
@@ -43,7 +42,8 @@ class verificationNotify():
         embed.add_field(name="Response 2: How did you get invited to this discord server?", value=q2, inline=False)
         embed.add_field(name="Response 3: Have you read and agree to the rules listed in the Rules Channel?", value=q3, inline=False)
         embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
-        whoIs = discord.ui.Button(style=discord.ButtonStyle.green, label="WhoIS", url=f"discord://-/users/{sender}")
+        whoIs = discord.ui.Button(style=discord.ButtonStyle.green, label="Profile", url=f"discord://-/users/{sender}")
+        
         view = discord.ui.View()
         view.add_item(whoIs)
         await notifyChannel.send(embed=embed, view=view)        
