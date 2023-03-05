@@ -141,6 +141,24 @@ class Admin(commands.Cog, name="Admin Commands"):
         await ctx.author.send(file=discord.File('./logs/log.log'))
         await ctx.author.send(file=discord.File('./logs/log.prev.log'))
 
+    @commands.command(name="raid", help="Toggle Raid mode for the server.", breif="Toggle raid mode")
+    @commands.has_guild_permissions(manage_messages=True)
+    async def raidMode(self, ctx:commands.Context):
+        logging.info("Raid mode toggled!")
+        with open('./database/raid.db', 'r') as fp:
+            raidBool = fp.read()
+        if raidBool == "0":
+            with open('./database.raid.db', 'w') as fp:
+                fp.write("1")
+            await ctx.reply("***RAID MODE ENABLED!***")
+            await adminCommandLogs(ctx.author, "ENABLED RAID MODE!", ctx.channel, self.bot)
+        elif raidBool == "1":
+            with open('./database.raid.db', 'w') as fp:
+                fp.write("0")
+            await ctx.reply("***RAID MODE DISABLED***")
+            await adminCommandLogs(ctx.author, "DISABLED RAID MODE!", ctx.channel, self.bot)
+        else:
+            await ctx.reply("Error!\nMalformed Database. Report this now!")
     
 
     

@@ -20,6 +20,10 @@ class verificationQuestionare(discord.ui.Modal, title='Verification', ):
     rulesAgreement = discord.ui.TextInput(label="Have you read and agree to the rules", placeholder="YES or NO", min_length=2, max_length=3, style=discord.TextStyle.short)
 
     async def on_submit(self, interaction: discord.Interaction):
+        with open('./database/raid.db', 'r') as fp:
+            raidBool = fp.read()
+        if raidBool == "1":
+            return
         db = TinyDB('./database/verification.json')
         db.insert({"id": str(interaction.user.id)})
         verif = verificationNotify(self.bot)
@@ -32,7 +36,11 @@ class verificationNotify():
 
     class verifyButton(discord.ui.Button):
         def __init__(self):
-            super().__init__(label="[Admin] Verify", style=discord.ButtonStyle.green,)
+            super().__init__(label="[Admin] Verify", style=discord.ButtonStyle.green)
+
+    class deleteButton(discord.ui.Button):
+        def __init__(self):
+            super().__init__(label="[Admin] Delete", style=discord.ButtonStyle.red)
 
     
     
@@ -54,6 +62,9 @@ class verificationNotify():
         view = discord.ui.View(timeout=None)
         verifyButton = self.verifyButton()
         verifyButton.custom_id = str(interaction1.user.id)
+        denyButton = self.deleteButton()
+        denyButton.custom_id = str(interaction1.user.id * 2)
+        view.add_item(denyButton)
         view.add_item(verifyButton)
         view.add_item(whoIs)
 
@@ -115,6 +126,14 @@ class verificationNotify():
             self.bot.add_view(view)
             await notification.edit(view=view)
 
+        async def delete(interaction:discord.Interaction):
+            if not interaction.user.guild_permissions.manage_roles: #type:ignore
+                await interaction.response.send_message("You don't have permission to do this!", ephemeral=True)
+                return
+            await notification.delete()
+
+
+        denyButton.callback = delete
         verifyButton.callback = giveVerRole
         self.bot.add_view(view)
         notification = await notifyChannel.send(embed=embed, view=view)
