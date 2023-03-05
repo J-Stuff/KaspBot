@@ -1,6 +1,7 @@
 import discord
 import sys
 import time
+import random
 import logging
 from tinydb import TinyDB, Query
 from discord.ext import commands
@@ -50,8 +51,9 @@ class verificationNotify():
         embed.add_field(name="Response 3: Have you read and agree to the rules listed in the Rules Channel?", value=q3, inline=False)
         embed.set_author(name=interaction1.user.name, icon_url=interaction1.user.display_avatar.url)
         whoIs = discord.ui.Button(style=discord.ButtonStyle.gray, label="Profile", url=f"discord://-/users/{sender}")
-        view = discord.ui.View()
+        view = discord.ui.View(timeout=None)
         verifyButton = self.verifyButton()
+        verifyButton.custom_id = str(interaction1.user.id)
         view.add_item(verifyButton)
         view.add_item(whoIs)
 
@@ -110,9 +112,11 @@ class verificationNotify():
                                 icon_url=interaction.user.avatar)
             await interaction.followup.edit_message(message_id=loader.id, embed=embedDone)
             verifyButton.disabled = True
+            self.bot.add_view(view)
             await notification.edit(view=view)
 
         verifyButton.callback = giveVerRole
+        self.bot.add_view(view)
         notification = await notifyChannel.send(embed=embed, view=view)
 class verificationClass(discord.ui.View):
     def __init__(self, bot):
