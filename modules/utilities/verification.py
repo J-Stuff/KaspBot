@@ -110,11 +110,12 @@ class verificationNotify():
             except discord.HTTPException:
                 logging.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
             
-            await adminCommandLogs(interaction.user, f"/verify\nVerified <@{sender}> (`{sender}`)!", interaction.channel, self.bot)
+            await adminCommandLogs(interaction.user, f"Verification Button\nVerified <@{sender}> (`{sender}`)!", interaction.channel, self.bot)
             try:
-                await updatedTarget.send(f"Your verification request in {guild.name} was accepted. Welcome!")
+                embed = discord.Embed(title="Verification", description=f"Your verification request in {guild.name} was accepted.\nWelcome!", color=discord.colour.parse_hex_number("e0c537"))
             except discord.Forbidden:
-                logging.error(f"Failed to notify {updatedTarget.id} they they have passed verification. They probably have their DM's off.")
+                logging.error(f"Failed to notify {updatedTarget.id} that they have passed verification. They probably have their DM's off.")
+                await interaction.followup.send(f"Failed to notify {updatedTarget.id} that they have passed verification. They probably have their DM's off.", ephemeral=True)
             embedDone = discord.Embed(
                 title="Verification", color=discord.colour.parse_hex_number("289100"))
             embedDone.add_field(name="Verification Complete",
@@ -131,6 +132,8 @@ class verificationNotify():
                 await interaction.response.send_message("You don't have permission to do this!", ephemeral=True)
                 return
             await notification.delete()
+            await interaction.response.send_message("Removed the message", ephemeral=True)
+            await adminCommandLogs(interaction.user, "Deleted a verification request", interaction.channel, self.bot)
 
 
         denyButton.callback = delete

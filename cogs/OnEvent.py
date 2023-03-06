@@ -5,6 +5,7 @@ import logging
 from tinydb import TinyDB, Query
 from config.getConfig import settings as unsettings
 settings = unsettings()
+from discord.utils import format_dt
 
 class Listeners(commands.Cog, name="On Event Listeners"):
     def __init__(self, bot:commands.Bot):
@@ -124,6 +125,20 @@ class Listeners(commands.Cog, name="On Event Listeners"):
         db = TinyDB('./database/verification.json')
         User = Query()
         result = db.remove(User.id == str(user.id))
+
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild:discord.Guild, user:discord.User|discord.Member):
+        logging.info("On ban fired!")
+        logChannel = await self.bot.fetch_channel(int(settings.getChannelID("accountLogs")))
+        embed = discord.Embed(title="User Banned", color=discord.colour.parse_hex_number("ff0000"))
+        embed.set_author(name=user.name + "#" + user.discriminator, icon_url=user.display_avatar.url)
+        embed.add_field(name="Username:", value=f"{user.name}#{user.discriminator}")
+        embed.add_field(name="User ID:", value=f"{user.id}")
+        embed.add_field(name="Account Created;", value=f"{format_dt(user.created_at, 'F')}\n(Which was: {format_dt(user.created_at, 'R')})")
+        if type(logChannel) is not discord.TextChannel:
+            logging.fatal("[accountLogs] in config doesn't point to a channel with type: discord.TextChannel!")
+            return
+        await logChannel.send(embed=embed)
 
     
     @commands.Cog.listener()

@@ -42,7 +42,7 @@ class Admin(commands.Cog, name="Admin Commands"):
         with open('./database/uptime.db', 'r') as fp:
             uptimeUnix = float(fp.read())
         uptime = str(datetime.timedelta(seconds=int(round(time.time()-uptimeUnix))))
-        info = settings.getBotVersion()
+        info = "1.2.2b"
         await ctx.send(f"Pong!\n<:satellite:1034018740897075231> `{str(ping_ms)} ms`\n{operationalMessage}\nI'm running KaspBot Version: {info}\nUptime: {uptime}")
 
     @commands.command(help="Send the embed for reaction roles. Requires manage_guild", brief="Reaction Roles Embed")
@@ -150,7 +150,7 @@ class Admin(commands.Cog, name="Admin Commands"):
         if raidBool == "0":
             with open('./database.raid.db', 'w') as fp:
                 fp.write("1")
-            await ctx.reply("***RAID MODE ENABLED!***")
+            await ctx.reply("***RAID MODE ENABLED!***\nVerification system suspended.")
             await adminCommandLogs(ctx.author, "ENABLED RAID MODE!", ctx.channel, self.bot)
         elif raidBool == "1":
             with open('./database.raid.db', 'w') as fp:

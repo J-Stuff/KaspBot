@@ -289,7 +289,7 @@ class userSlash(commands.Cog, name="User Slash Commands"):
         self.bot = bot
 
     @app_commands.command(name="boop", description="Boop a user")
-    @app_commands.checks.cooldown(1, 60, key=lambda i: (i.guild_id, i.user.id))
+    @app_commands.checks.cooldown(1, 300, key=lambda i: (i.guild_id, i.user.id))
     async def userBoop(self, interaction:discord.Interaction, user:discord.Member|discord.User):
         with open('./database/boops.db', 'r') as fp:
             boopList = fp.read().splitlines()
@@ -300,6 +300,20 @@ class userSlash(commands.Cog, name="User Slash Commands"):
             if not channel or type(channel) is not discord.TextChannel:
                 return
             await channel.send(boop)
+
+
+    @app_commands.command(name="hug", description="Hug a user")
+    @app_commands.checks.cooldown(2, 300, key=lambda i: (i.guild_id, i.user.id))
+    async def userHug(self, interaction:discord.Interaction, user:discord.User|discord.Member):
+        with open('./database/hugs.db', 'r') as fp:
+            hugList = fp.read().splitlines()
+            hug = random.choice(hugList)
+            await userCommandLogs(interaction.user, f"/hug on {user.mention}", interaction.channel, self.bot)
+            await interaction.response.send_message(f"{interaction.user.mention} *hugs* {user.mention}")
+            channel = interaction.channel
+            if not channel or type(channel) is not discord.TextChannel:
+                return
+            await channel.send(hug)
 
     @app_commands.command(name="lookup", description="Look up a user")
     @app_commands.checks.cooldown(3, 120, key=lambda i: (i.guild_id, i.user.id))
