@@ -85,6 +85,7 @@ class verificationNotify():
             if memberRole in updatedTarget.roles: 
                 await interaction.response.send_message(f"User is already verified!", ephemeral=True)
                 verifyButton.disabled = True
+                denyButton.disabled = True
                 await notification.edit(view=view)
                 return
             
@@ -124,6 +125,7 @@ class verificationNotify():
                                 icon_url=interaction.user.avatar)
             await interaction.followup.edit_message(message_id=loader.id, embed=embedDone)
             verifyButton.disabled = True
+            denyButton.disabled = True
             self.bot.add_view(view)
             await notification.edit(view=view)
 
