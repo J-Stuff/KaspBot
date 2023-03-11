@@ -1,5 +1,0 @@
-MONGO_connection_string="mongodb://192.168.100.1:27017/"
-MONGO_maindb="kaspbotBeta"
-MONGO_settings_collection="settings"
-
-These need to be preset env variables!
