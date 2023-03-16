@@ -4,11 +4,9 @@ import logging
 
 class settings():
     def readSettings(self):
-        logging.debug("Reading config file...")
         with open('./config/config.json', 'r') as fp:
             x = json.load(fp)
             fp.close()
-        # logging.debug(x)
         return x
 
 
@@ -22,16 +20,6 @@ class settings():
         logging.debug(f"getReactionRoleID > {id}")
         return int(id)
     
-    def getBotVersion(self):
-        logging.debug(f"getBotVersion > Looking for bot version")
-        config:dict = self.readSettings()
-        try:
-            version:str = config["botSettings"]["botVersion"]
-        except:
-            raise Exception(f"Cannot find [botSettings] [botVersion] in the config!")
-        logging.debug(f"getBotVersion > {version}")
-        return version
-    
     def getChannelID(self, key:str):
         logging.debug(f"getChannelID > Looking for [channelIds] [{key}]")
         config:dict = self.readSettings()
@@ -42,7 +30,7 @@ class settings():
         logging.debug(f"getChannelID > {id}")
         return id
     
-    def getMiscId(self, key:str):
+    def getMiscId(self, key:str) -> int:
         logging.debug(f"getMiscId > Looking for [miscIds] [{key}]")
         config:dict = self.readSettings()
         try:
@@ -51,5 +39,13 @@ class settings():
             raise Exception(f"Cannot find [miscIds] [{key}] in the config!")
         logging.debug(f"getMiscId > {id}")
         return id
+    
+    def getBotSetting(self, key:str) -> str:
+        config:dict = self.readSettings()
+        try:
+            setting = config["botSettings"][key]
+        except:
+            raise Exception(f"Cannot find [miscIds] [{key}] in the config!")
+        return setting
     
     

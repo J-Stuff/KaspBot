@@ -1,7 +1,7 @@
 {
     "botSettings": {
         "DEPRECATED-token-DEPRECATED": "DEPRECATED! Use an ENV called 'discord_token'",
-        "botVersion": "1.2.2a"
+        "webhook-Url": null
     },
 
     "channelIds": {
@@ -11,6 +11,7 @@
         "ticketLogs": null,
         "commandLogs": null,
         "accountLogs": null,
+        "welcomeChanel": null,
         "reportCATEGORY": null
     },
 
@@ -18,6 +19,8 @@
         "memberRole": null,
         "unverifiedID": null,
         "guildID": null,
+        "18+Role": null,
+        "degenRole": null,
         "reportPing": [
             null,
             null

@@ -8,15 +8,18 @@ ADD main.py main.py
 
 COPY requirements.txt /tmp/requirements.txt
 
-COPY ./logs /logging
+COPY main.py /worker/main.py
+COPY /cogs /worker/cogs/
+COPY /config /worker/config/
+COPY /database /worker/database/
+COPY /modules /worker/modules/
 
-COPY ./config /config
+RUN mkdir /worker/temp
+RUN mkdir /worker/logs
 
-COPY ./database /database
-
-COPY . /worker
 WORKDIR /worker
 
 RUN python3 -m pip install -r /tmp/requirements.txt
+RUN rm /tmp/requirements.txt
 
 CMD python /worker/main.py

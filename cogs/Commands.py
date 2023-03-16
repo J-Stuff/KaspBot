@@ -1,8 +1,8 @@
-import discord, time, datetime, os, asyncio, logging, random, sys
+import discord, time, datetime, os, asyncio, logging, random, sys, typing
 from discord.ext import commands
 from discord import app_commands
 from discord.utils import format_dt
-from config.getConfig import settings as preSettings
+from modules.config.getConfig import settings as preSettings
 from modules.logging.userCommandLogs import userCommandLogs
 from modules.logging.adminCommandLogs import adminCommandLogs
 settings = preSettings()
@@ -14,55 +14,73 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
 
     @app_commands.command(name="purge", description="Allows an admin to purge the chat")
     @app_commands.checks.has_permissions(manage_messages=True)
-    async def purgeChat(self, interaction:discord.Interaction, count: int):
+    async def purgeChat(self, interaction:discord.Interaction, count: int=100, user: discord.Member|None = None):
         logging.debug("Purge Ran")
+        await interaction.response.defer(thinking=True)
         channel = interaction.channel
-        if not channel:
-            logging.fatal("Channel is None in purge, Failing!")
+        if not channel or type(channel) is not discord.TextChannel:
             return
-        if type(channel) is not discord.TextChannel:
-            logging.info("Channel is not textchannel when purge called. Failing!")
-            return
-        await interaction.response.defer(ephemeral=False, thinking=True)
-        logging.debug("Interaction Deferred")
-        logging.debug("Beginning purge...")
-        purged = await channel.purge(limit=count)
-        logging.debug("Purge complete!")
-        logging.debug("Logging purge content...")
-        with open('./temp/PURGE.txt', 'w') as fp:
-            now = datetime.datetime.utcnow()
-            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            fp.write(f"Purged at: {dt_string} UTC")
-            fp.write('\n')
-            fp.write(f"Purged by user: {interaction.user} ({interaction.user.id})")
-            fp.write('\n')
-            fp.write('======================================================')
-            fp.write('\n')
-            fp.write('\n')
-            for message in purged:
-                sentAt = message.created_at 
-                sent_timeStamp = sentAt.strftime("%d/%m/%Y %H:%M:%S")
-                fp.write(f"Author: {message.author} ({message.author.id}) // At: {sent_timeStamp} | Content: {message.content} | Attachments: {message.attachments}")
-        logging.debug("Logging of purged content complete!")
+        now = datetime.datetime.utcnow()
+        dateLimit = now - datetime.timedelta(days=13, hours=16)
+        
 
+        if user:
+            userMessages = [message async for message in channel.history(limit=None, after=dateLimit, oldest_first=False) if message.author.id == user.id]
+
+            toCull = userMessages[:count]
+
+
+        else:
+            toCull = [message async for message in channel.history(limit=count+1, after=dateLimit, oldest_first=False)]
+
+        with open("./temp/purge.txt", 'w') as fp:
+            fp.write("PURGE LOG")
+            fp.write('\n')
+            fp.write("============================")
+            fp.write('\n')
+            fp.write(f"Purge Requested by: {interaction.user.display_name} // {interaction.user.id}")
+            fp.write('\n')
+            fp.write(f"Purge Stats: TIME: {now} // Channel: {interaction.channel.name} // Purge Limit: {count} // Number of messages to Delete: {len(toCull)}") #type:ignore
+            fp.write('\n')
+            fp.write("============================")
+            fp.write('\n')
+            fp.write('\n')
+            fp.write('\n')
+            for message in toCull:
+                fp.write(f"Author: {message.author} / {message.author.id} /// Message Content: {message.content}")
+                fp.write('\n')
+
+
+
+        logging.debug(f"Will cull {len(toCull)} message(s)")
+        for i in range(0, len(toCull), 98):
+            logging.debug(toCull[i:i+98])
+            await channel.delete_messages(toCull[i:i+98])
+        if not user:
+            await channel.send(f"Purged `{len(toCull)}` message(s)!")
+        else:
+            await interaction.followup.send(f"Purged `{len(toCull)}` message(s)!")
+        
+        if user:
+            await adminCommandLogs(interaction.user, f"Purged messages from {user.mention}", channel, self.bot)
+        else:
+            await adminCommandLogs(interaction.user, f"Purged messages // ({count})", channel, self.bot)
 
         logChannelID = settings.getChannelID("adminLogs")
         logChannel = await self.bot.fetch_channel(int(logChannelID))
         if type(logChannel) is not discord.TextChannel:
-            sys.exit("BAD CHANNEL ID FOR: admin_log_channel")
+            logging.fatal("BAD CHANNEL ID FOR: admin_log_channel")
+            return
+        await logChannel.send(file=discord.File("./temp/purge.txt"))
+        os.remove("./temp/purge.txt")
+
+
+
+
+# for i in range(0,len(myList),100):
+#     sub = myList[i:i+100]
+#     print(f'sum of {sub[0]}..{sub[-1]} is {sum(sub)}')
         
-        logging.debug("Sending purge log!")
-        await logChannel.send("Purge log", file=discord.File('./temp/PURGE.txt'))
-        logging.debug("Sent purge log")
-
-        logging.debug("Removing purge file...")
-        os.remove("./temp/PURGE.txt")
-        logging.debug("Removed purge file")
-
-        logging.debug("Sending purge confirmation...")
-        await channel.send(f"Done! Purged `{count}` messages!")
-        logging.debug("Sending Admin Log of purge event...")
-        await adminCommandLogs(interaction.user, f"Purged {count} messages!", interaction.channel, self.bot)
 
     @app_commands.command(name="verify", description="Verify a user!")
     @app_commands.checks.has_permissions(manage_roles=True)
@@ -126,7 +144,7 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
         accountCreation = target.created_at
         accountUnix = int(time.mktime(accountCreation.timetuple()))
         embed.add_field(name="Account Created",
-                        value=f"<t:{accountUnix}:F>\nWhich was: <t:{accountUnix}:R>", inline=False)
+                        value=f"{format_dt(target.created_at, 'f')}\nWhich was: {format_dt(target.created_at, 'R')}", inline=False)
         embed.add_field(
             name='To cancel', value="To cancel this operation, simply ignore this embed and hit 'dismiss message' below", inline=False)
 
@@ -182,8 +200,7 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
                         fp.write('\n')
             logChannel = bot.get_channel(int(settings.getChannelID("ticketLogs")))
             embed = discord.Embed(title="A ticket was closed", color=discord.colour.parse_hex_number("0099ff"))
-            unix = int(time.time())
-            embed.add_field(name="Closed on:", value=f"<t:{unix}:F>\n(<t:{unix}:R>)")
+            embed.add_field(name="Closed on:", value=f"{format_dt(datetime.datetime.now(), 'f')}\n({format_dt(datetime.datetime.now(), 'R')})")
             embed.add_field(name="Closed by:", value=closedBy.mention)
             await logChannel.send(embed=embed, file=discord.File(f"./temp/{fileID}.txt")) #type:ignore
             time.sleep(1)
@@ -212,7 +229,7 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
         if not guild:
             return
         await interaction.response.defer(thinking=True, ephemeral=True)
-        user_warnEmbed = discord.Embed(title='You have received a Warn!', description=f"You recieved a warn from {guild.name}")
+        user_warnEmbed = discord.Embed(title='You have received a Warn!', description=f"You have received a warn from {guild.name}")
         user_warnEmbed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar.url)
         user_warnEmbed.add_field(name="Reason", value=reason)
 
@@ -275,6 +292,47 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
                     logging.debug("is clear")
 
             await interaction.followup.send("All done!")
+
+    @app_commands.command(name="add-role", description="Add a role to a user, Also toggles if the user already has the role!")
+    @app_commands.checks.has_permissions(manage_roles=True)
+    async def do_giveRole(self, interaction:discord.Interaction, target:discord.Member, role:typing.Literal["18+", "Degenerate"]):
+        guild = interaction.guild
+        if not guild:
+            return
+        if role == "18+":
+            roleID = settings.getMiscId("18+Role")
+            roleObj = guild.get_role(roleID)
+            if roleObj == None:
+                logging.critical("[18+Role] in config is invalid!")
+                raise Exception("[18+Role] in config is invalid!")
+            if roleObj in target.roles:
+                await interaction.response.send_message(f"Removing {roleObj.name} from {target}...")
+                await target.remove_roles(roleObj)
+                await interaction.followup.send("Done!", ephemeral=True)
+                await adminCommandLogs(interaction.user, f"Removed the role {roleObj.mention} from {target.mention}", interaction.channel, self.bot)
+            else:
+                await interaction.response.send_message(f"Adding {roleObj.name} to {target}...")
+                await target.add_roles(roleObj)
+                await interaction.followup.send("Done!", ephemeral=True)
+                await adminCommandLogs(interaction.user, f"Added the role {roleObj.mention} to {target.mention}", interaction.channel, self.bot)
+        elif role == "Degenerate":
+            roleID = settings.getMiscId("degenRole")
+            roleObj = guild.get_role(roleID)
+            if roleObj == None:
+                logging.critical("[degenRole] in config is invalid!")
+                raise Exception("[degenRole] in config is invalid!")
+            if roleObj in target.roles:
+                await interaction.response.send_message(f"Removing {roleObj.name} from {target}...")
+                await target.remove_roles(roleObj)
+                await interaction.followup.send("Done!")
+                await adminCommandLogs(interaction.user, f"Removed the role {roleObj.mention} from {target.mention}", interaction.channel, self.bot)
+            else:
+                await interaction.response.send_message(f"Adding {roleObj.name} to {target}...")
+                await target.add_roles(roleObj)
+                await interaction.followup.send("Done!")
+                await adminCommandLogs(interaction.user, f"Added the role {roleObj.mention} to {target.mention}", interaction.channel, self.bot)
+
+
 
     async def cog_app_command_error(
         self,

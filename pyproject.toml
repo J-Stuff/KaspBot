@@ -1,0 +1,29 @@
+[tool.pdm]
+
+[project]
+name = "KaspBot"
+version = "1.3.3.7"
+description = "KaspKaspKaspKaspKaspKaspKaspKaspKasp"
+authors = [
+    {name = "J-Stuff", email = "jstuff@j-stuff.net"},
+    {name = "EdPlayZ", email = "19842038+EdPlayZ@users.noreply.github.com"},
+]
+dependencies = [
+    "requests",
+    "python-dotenv",
+    "discord-py",
+    "tinydb",
+    "discord-webhook-logging>=0.0.3",
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+[tool.pdm.scripts]
+bot.cmd = "python3 main.py"
+bot.env_file = ".env"
+test.cmd = "python3 main.py"
+test.env_file = ".env"

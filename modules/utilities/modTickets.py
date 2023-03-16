@@ -5,7 +5,7 @@ import datetime
 import logging
 from discord.utils import get
 from modules.logging.userCommandLogs import userCommandLogs
-from config.getConfig import settings as unsettings
+from modules.config.getConfig import settings as unsettings
 settings = unsettings()
 from discord.ext import commands
 class ModTicket(discord.ui.View):

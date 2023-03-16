@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.utils import format_dt
 import os
 import logging
-from config.getConfig import settings as unsettings
+from modules.config.getConfig import settings as unsettings
 settings = unsettings()
 
 async def userCommandLogs(user:discord.User|discord.Member, message:str, channel, bot:commands.Bot):

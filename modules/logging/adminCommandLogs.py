@@ -5,7 +5,7 @@ import os
 import logging
 from discord.ext import commands
 from discord.utils import format_dt
-from config.getConfig import settings as unsetSettings
+from modules.config.getConfig import settings as unsetSettings
 settings = unsetSettings()
 
 async def adminCommandLogs(user:discord.User|discord.Member, message:str, channel, bot:commands.Bot):

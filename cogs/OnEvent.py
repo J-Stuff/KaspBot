@@ -3,7 +3,7 @@ import time
 import discord
 import logging
 from tinydb import TinyDB, Query
-from config.getConfig import settings as unsettings
+from modules.config.getConfig import settings as unsettings
 settings = unsettings()
 from discord.utils import format_dt
 

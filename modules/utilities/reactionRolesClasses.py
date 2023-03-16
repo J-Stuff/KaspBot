@@ -3,7 +3,7 @@ from discord.ext import commands
 import sys
 import logging
 from modules.logging.userCommandLogs import userCommandLogs
-from config.getConfig import settings as unsettings
+from modules.config.getConfig import settings as unsettings
 settings = unsettings()
 class SpeciesRoles(discord.ui.View):
     def __init__(self, bot):

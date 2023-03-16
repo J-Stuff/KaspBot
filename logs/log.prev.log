@@ -1,0 +1,112 @@
+2023-03-15 12:32:53 WARNING  PyNaCl is not installed, voice will NOT be supported
+2023-03-15 12:32:53 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:53 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:53 DEBUG    Using proactor: IocpProactor
+2023-03-15 12:32:53 INFO     logging in using static token
+2023-03-15 12:32:53 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:54 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:54 INFO     Setup hook run!
+2023-03-15 12:32:54 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:55 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:55 INFO     Loading cog/extension: cogs.AdminCommands
+2023-03-15 12:32:55 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:55 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:55 INFO     Loaded cog/extension: cogs.AdminCommands
+2023-03-15 12:32:55 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:56 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:56 INFO     Loading cog/extension: cogs.Commands
+2023-03-15 12:32:56 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:56 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:56 INFO     E:\Scripts\KaspBot\cogs\Commands.py - Setting up...
+2023-03-15 12:32:56 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:56 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:56 DEBUG    getMiscId > Looking for [miscIds] [guildID]
+2023-03-15 12:32:56 DEBUG    getMiscId > 1085330631019479122
+2023-03-15 12:32:56 DEBUG    adminSlash init ran
+2023-03-15 12:32:56 INFO     Syncing tree...
+2023-03-15 12:32:56 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:57 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:57 INFO     [<AppCommand id=1085334574009172049 name='purge' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172050 name='verify' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172051 name='unverified-scan' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172052 name='ticket-close' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172053 name='warn' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172054 name='unverified-kick' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172055 name='add-role' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172056 name='boop' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172057 name='hug' type=<AppCommandType.chat_input: 1>>, <AppCommand id=1085334574009172058 name='lookup' type=<AppCommandType.chat_input: 1>>]
+2023-03-15 12:32:57 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:58 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:58 INFO     Sync of tree complete!
+2023-03-15 12:32:58 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:58 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:58 INFO     E:\Scripts\KaspBot\cogs\Commands.py - Done!
+2023-03-15 12:32:58 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:59 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:59 INFO     Loaded cog/extension: cogs.Commands
+2023-03-15 12:32:59 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:59 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:59 INFO     Loading cog/extension: cogs.LoopingFunctions
+2023-03-15 12:32:59 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:32:59 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:32:59 INFO     E:\Scripts\KaspBot\cogs\LoopingFunctions.py - Setting up...
+2023-03-15 12:32:59 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:00 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:00 INFO     E:\Scripts\KaspBot\cogs\LoopingFunctions.py - Done!
+2023-03-15 12:33:00 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:00 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:00 INFO     Loaded cog/extension: cogs.LoopingFunctions
+2023-03-15 12:33:00 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:01 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:01 INFO     Loading cog/extension: cogs.OnEvent
+2023-03-15 12:33:01 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:01 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:01 INFO     E:\Scripts\KaspBot\cogs\OnEvent.py - Setting up...
+2023-03-15 12:33:01 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:02 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:02 INFO     E:\Scripts\KaspBot\cogs\OnEvent.py - Done!
+2023-03-15 12:33:02 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:02 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:02 INFO     Loaded cog/extension: cogs.OnEvent
+2023-03-15 12:33:02 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:03 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:03 INFO     Cogs initialized!
+2023-03-15 12:33:03 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:03 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:03 INFO     Waiting for websocket
+2023-03-15 12:33:03 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:03 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:04 INFO     Shard ID None has connected to Gateway (Session ID: d93c8b0001d7782096067059cf20545a).
+2023-03-15 12:33:04 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:04 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:06 INFO     Connected as KaspBot Beta#6613
+2023-03-15 12:33:06 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:07 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:07 INFO     Starting up...
+2023-03-15 12:33:07 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:07 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:07 INFO     Init of Reaction Role Classes Complete!
+2023-03-15 12:33:07 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:08 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:08 INFO     Ready!
+2023-03-15 12:33:08 DEBUG    Starting new HTTPS connection (1): discord.com:443
+2023-03-15 12:33:08 DEBUG    https://discord.com:443 "POST /api/webhooks/1085330776591171615/QrBYUKZLnu3UBxc-5CLQfbIn-cy4mBXjLatpPxWVKvQcgTiIu9kb_ayVPsW3auR__5UD HTTP/1.1" 204 0
+2023-03-15 12:33:08 DEBUG    Rotating bot custom status
+2023-03-15 12:33:08 DEBUG    Reading status DB
+2023-03-15 12:33:08 DEBUG    Parsing JSON
+2023-03-15 12:33:08 DEBUG    Picking a new status
+2023-03-15 12:33:08 DEBUG    Using status: {'type': 'playing', 'content': 'with my tail'}
+2023-03-15 12:33:08 DEBUG    Rotating presence now...
+2023-03-15 12:35:06 DEBUG    Rotating bot custom status
+2023-03-15 12:35:06 DEBUG    Reading status DB
+2023-03-15 12:35:06 DEBUG    Parsing JSON
+2023-03-15 12:35:06 DEBUG    Picking a new status
+2023-03-15 12:35:06 DEBUG    Using status: {'type': 'playing', 'content': 'with my paw beans'}
+2023-03-15 12:35:06 DEBUG    Rotating presence now...
+2023-03-15 12:37:06 DEBUG    Rotating bot custom status
+2023-03-15 12:37:06 DEBUG    Reading status DB
+2023-03-15 12:37:06 DEBUG    Parsing JSON
+2023-03-15 12:37:06 DEBUG    Picking a new status
+2023-03-15 12:37:06 DEBUG    Using status: {'type': 'playing', 'content': 'with your toys; Mine now'}
+2023-03-15 12:37:06 DEBUG    Rotating presence now...
+2023-03-15 12:39:06 DEBUG    Rotating bot custom status
+2023-03-15 12:39:06 DEBUG    Reading status DB
+2023-03-15 12:39:06 DEBUG    Parsing JSON
+2023-03-15 12:39:06 DEBUG    Picking a new status
+2023-03-15 12:39:06 DEBUG    Using status: {'type': 'listening', 'content': 'to Kasper yell at his truck'}
+2023-03-15 12:39:06 DEBUG    Rotating presence now...
+2023-03-15 12:39:08 ERROR    Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022F5E7F7050>
+2023-03-15 12:39:08 DEBUG    Starting new HTTPS connection (1): discord.com:443
