@@ -11,7 +11,7 @@ authors = [
 dependencies = [
     "requests",
     "python-dotenv",
-    "discord-py",
+    "discord-py[voice]>=2.2.2",
     "tinydb",
     "discord-webhook-logging>=0.0.3",
 ]
