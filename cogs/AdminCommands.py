@@ -42,7 +42,7 @@ class Admin(commands.Cog, name="Admin Commands"):
         with open('./database/uptime.db', 'r') as fp:
             uptimeUnix = float(fp.read())
         uptime = str(datetime.timedelta(seconds=int(round(time.time()-uptimeUnix))))
-        info = "1.2.2c (16.3.23)"
+        info = "1.2.2d (24.3.23)"
         await ctx.send(f"Pong!\n<:satellite:1034018740897075231> `{str(ping_ms)} ms`\n{operationalMessage}\nI'm running KaspBot Version: {info}\nUptime: {uptime}")
 
     @commands.command(help="Send the embed for reaction roles. Requires manage_guild", brief="Reaction Roles Embed")

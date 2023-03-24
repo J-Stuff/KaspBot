@@ -249,49 +249,37 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
         logging.debug("Running unverifiedKick")
         confirm = random.randint(111, 999)
         logging.debug(f"Confirm code is: {confirm}")
+        guild = interaction.guild
+        if guild == None:
+                logging.fatal("Yeah, something majorly fucked up") # https://discord.com/channels/1038438846104338473/1038438847534600255/1080791479544451132
+                return
+        unverifiedRole = guild.get_role(int(settings.getMiscId("memberRole")))
+        if not unverifiedRole:
+            logging.fatal("Unverified role in config is bad!")
+            return
+        await interaction.response.defer(thinking=True, ephemeral=False)
         confirmEmbed = discord.Embed(title="Warning!!!", 
-                                    description=f"The action you are about to take is **Destructive**\n\nYou are about to kick all unverified members, that have been in the server for more than 14 days.\n\nDo you understand that after starting this action, that it cannot be stopped until complete?\n\nType the following code within 20 seconds to confirm. Or wait for 20 seconds to cancel. \n`{confirm}`",
+                                    description=f"The action you are about to take is **Destructive**\n\nYou are about to kick all unverified members, that have been in the server for more than 14 days. \n[This totals to approx `{await guild.estimate_pruned_members(days=14, roles=[unverifiedRole])}` members]\n\nDo you understand that after starting this action, that it cannot be stopped until complete?\n\nType the following code within 20 seconds to confirm. Or wait for 20 seconds to cancel. \n`{confirm}`",
                                     color=discord.colour.parse_hex_number("ff0000"))
-        await interaction.response.send_message(embed=confirmEmbed)
+        await interaction.followup.send(embed=confirmEmbed)
         def check(m:discord.Message):
             logging.debug(f"Testing to see if response matches challange code || Challenge code: {confirm} // Response: {m.content}")
             return m.content == str(confirm) and m.author == interaction.user
         try:
             response = await self.bot.wait_for("message", check=check, timeout=20)
         except asyncio.TimeoutError:
-            await interaction.followup.send("Timeout passed. Command aborted!")
+            await interaction.followup.send("Challenge timeout passed. Command aborted!")
             logging.debug("Challenge Timed out!")
             return
         else:
             await interaction.followup.send("Authenticated!")
             logging.debug("Challenge passed!")
+        
+        count = await guild.prune_members(days=14, roles=[unverifiedRole], compute_prune_count=True, reason=f"Kicked in the unverified kick run by {interaction.user}")
+        await adminCommandLogs(interaction.user, f"Ran unverified kick. Removed {count} members", interaction.channel, self.bot)
+        await interaction.followup.send(f"Done! Removed `{count}` members!")
             
             # ==========================================================
-
-            if interaction.guild == None:
-                logging.fatal("Yeah, something majorly fucked up") # https://discord.com/channels/1038438846104338473/1038438847534600255/1080791479544451132
-                return
-            
-            unverifiedRole = interaction.guild.get_role(int(settings.getMiscId("memberRole")))
-            verifiedRole = interaction.guild.get_role(int(settings.getMiscId("unverifiedID")))
-            async for user in interaction.guild.fetch_members(limit=None):
-                logging.debug(user)
-                if unverifiedRole in user.roles and verifiedRole not in user.roles:
-                    logging.debug("is unverified")
-                    logging.debug(user.joined_at)
-                    joined = user.joined_at
-                    if not joined:
-                        continue
-                    if joined - datetime.timedelta(days=14) == 0:
-                        logging.debug("is over 2 weeks, kicking!")
-                        await interaction.followup.send(f"Kicking {user.name}", ephemeral=True)
-                        await user.kick(reason="Kicked due to unverified scan!")
-                        await interaction.followup.send(f"Kicked {user.mention} // Reason: Kicked due to unverified scan", ephemeral=True)
-                        await adminCommandLogs(interaction.user, f"Kicked {user.mention} during unverified purge", interaction.channel, self.bot) 
-                else:
-                    logging.debug("is clear")
-
-            await interaction.followup.send("All done!")
 
     @app_commands.command(name="add-role", description="Add a role to a user, Also toggles if the user already has the role!")
     @app_commands.checks.has_permissions(manage_roles=True)
