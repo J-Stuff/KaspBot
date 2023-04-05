@@ -3,13 +3,14 @@ import datetime
 import discord
 import os
 import logging
+logger = logging.getLogger('kaspbot')
 from discord.ext import commands
 from discord.utils import format_dt
 from modules.config.getConfig import settings as unsetSettings
 settings = unsetSettings()
 
 async def adminCommandLogs(user:discord.User|discord.Member, message:str, channel, bot:commands.Bot):
-    logging.info("Admin logging was fired")
+    logger.info("Admin logging was fired")
     now = datetime.datetime.now()
     longDate = format_dt(now, "D")
     longTime = format_dt(now, "T")

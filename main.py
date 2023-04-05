@@ -1,4 +1,5 @@
 import logging
+import logging.handlers
 import time
 import os
 import sys
@@ -32,18 +33,33 @@ startupPost.raise_for_status()
 time.sleep(1)
 
 
+log_level = logging.INFO
 
-logging.basicConfig(filename='./logs/log.log', encoding='utf-8', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)-8s %(message)s')
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+stream_formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(name)s %(message)s')
 stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(formatter)
-stream_handler.setLevel(logging.INFO)
-discordHandler = DiscordWebhookHandler(webhook_url=settings.getBotSetting("webhook-Url"),auto_flush=True)
-discordHandler.setLevel(logging.INFO)
+stream_handler.setFormatter(stream_formatter)
 
-logger = logging.getLogger()
-logger.addHandler(stream_handler)
-logger.addHandler(discordHandler)
+discord_handler = DiscordWebhookHandler(webhook_url=settings.getBotSetting("webhook-Url"), auto_flush=True)
+
+file_formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(name)s %(message)s')
+file_handler = logging.handlers.RotatingFileHandler(filename='./logs/log.log', encoding="utf-8", )
+file_handler.setFormatter(file_formatter)
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)
+root_logger.addHandler(file_handler)
+
+kaspbot_logger = logging.getLogger('kaspbot')
+kaspbot_logger.setLevel(logging.INFO)
+
+discord_logger = logging.getLogger('discord')
+discord_logger.setLevel(logging.INFO)
+
+kaspbot_logger.addHandler(stream_handler)
+kaspbot_logger.addHandler(discord_handler)
+
+# discord_logger.addHandler(stream_handler)
+discord_logger.addHandler(discord_handler)
 
 class KaspBot(commands.Bot):
     def __init__(self):
@@ -53,14 +69,14 @@ class KaspBot(commands.Bot):
         )
 
     async def setup_hook(self):
-        logging.info("Setup hook run!")
+        kaspbot_logger.info("Setup hook run!")
         from modules.botMaintenance.cog_controller import cogController
         controller = cogController(self)
         await controller.initCogs()
-        logging.info("Cogs initialized!")
+        kaspbot_logger.info("Cogs initialized!")
 
     async def on_ready(self):
-        logging.info(f"Connected as {self.user}")
+        kaspbot_logger.info(f"Connected as {self.user}")
 
 
 if __name__ in "__main__":

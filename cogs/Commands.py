@@ -1,4 +1,4 @@
-import discord, time, datetime, os, asyncio, logging, random, sys, typing
+import discord, time, datetime, os, asyncio, random, typing
 from discord.ext import commands
 from discord import app_commands
 from discord.utils import format_dt
@@ -6,16 +6,18 @@ from modules.config.getConfig import settings as preSettings
 from modules.logging.userCommandLogs import userCommandLogs
 from modules.logging.adminCommandLogs import adminCommandLogs
 settings = preSettings()
+import logging
+logger = logging.getLogger('kaspbot')
 
 class adminSlash(commands.Cog, name="Admin Slash Commands"):
     def __init__(self, bot:commands.Bot):
-        logging.debug("adminSlash init ran")
+        logger.debug("adminSlash init ran")
         self.bot = bot
 
     @app_commands.command(name="purge", description="Allows an admin to purge the chat")
     @app_commands.checks.has_permissions(manage_messages=True)
     async def purgeChat(self, interaction:discord.Interaction, count: int=100, user: discord.Member|None = None):
-        logging.debug("Purge Ran")
+        logger.debug("Purge Ran")
         await interaction.response.defer(thinking=True)
         channel = interaction.channel
         if not channel or type(channel) is not discord.TextChannel:
@@ -52,9 +54,9 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
 
 
 
-        logging.debug(f"Will cull {len(toCull)} message(s)")
+        logger.debug(f"Will cull {len(toCull)} message(s)")
         for i in range(0, len(toCull), 98):
-            logging.debug(toCull[i:i+98])
+            logger.debug(toCull[i:i+98])
             await channel.delete_messages(toCull[i:i+98])
         if not user:
             await channel.send(f"Purged `{len(toCull)}` message(s)!")
@@ -69,7 +71,7 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
         logChannelID = settings.getChannelID("adminLogs")
         logChannel = await self.bot.fetch_channel(int(logChannelID))
         if type(logChannel) is not discord.TextChannel:
-            logging.fatal("BAD CHANNEL ID FOR: admin_log_channel")
+            logger.fatal("BAD CHANNEL ID FOR: admin_log_channel")
             return
         await logChannel.send(file=discord.File("./temp/purge.txt"))
         os.remove("./temp/purge.txt")
@@ -122,13 +124,13 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
             try:
                 await target.remove_roles(unv_role)
             except discord.HTTPException:
-                logging.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
+                logger.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
             
             await adminCommandLogs(interaction.user, f"/verify\nVerified <@{target.id}> (`{target}` // `{target.id}`)!", interaction.channel, self.bot)
             try:
                 await target.send(f"Your verification request in {target.guild.name} was accepted. Welcome!")
             except discord.Forbidden:
-                logging.error(f"Failed to notify {updatedTarget.id} they they have passed verification. They probably have their DM's off.")
+                logger.error(f"Failed to notify {updatedTarget.id} they they have passed verification. They probably have their DM's off.")
             embedDone = discord.Embed(
                 title="Verification", color=discord.colour.parse_hex_number("289100"))
             embedDone.add_field(name="Verification Complete",
@@ -246,16 +248,16 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
     @app_commands.command(name="unverified-kick", description="Run the kick operation for unverified users")
     @app_commands.checks.has_permissions(administrator=True)
     async def do_unverifiedKick(self, interaction:discord.Interaction):
-        logging.debug("Running unverifiedKick")
+        logger.debug("Running unverifiedKick")
         confirm = random.randint(111, 999)
-        logging.debug(f"Confirm code is: {confirm}")
+        logger.debug(f"Confirm code is: {confirm}")
         guild = interaction.guild
         if guild == None:
-                logging.fatal("Yeah, something majorly fucked up") # https://discord.com/channels/1038438846104338473/1038438847534600255/1080791479544451132
+                logger.fatal("Yeah, something majorly fucked up") # https://discord.com/channels/1038438846104338473/1038438847534600255/1080791479544451132
                 return
         unverifiedRole = guild.get_role(int(settings.getMiscId("memberRole")))
         if not unverifiedRole:
-            logging.fatal("Unverified role in config is bad!")
+            logger.fatal("Unverified role in config is bad!")
             return
         await interaction.response.defer(thinking=True, ephemeral=False)
         confirmEmbed = discord.Embed(title="Warning!!!", 
@@ -263,17 +265,17 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
                                     color=discord.colour.parse_hex_number("ff0000"))
         await interaction.followup.send(embed=confirmEmbed)
         def check(m:discord.Message):
-            logging.debug(f"Testing to see if response matches challange code || Challenge code: {confirm} // Response: {m.content}")
+            logger.debug(f"Testing to see if response matches challange code || Challenge code: {confirm} // Response: {m.content}")
             return m.content == str(confirm) and m.author == interaction.user
         try:
             response = await self.bot.wait_for("message", check=check, timeout=20)
         except asyncio.TimeoutError:
             await interaction.followup.send("Challenge timeout passed. Command aborted!")
-            logging.debug("Challenge Timed out!")
+            logger.debug("Challenge Timed out!")
             return
         else:
             await interaction.followup.send("Authenticated!")
-            logging.debug("Challenge passed!")
+            logger.debug("Challenge passed!")
         
         count = await guild.prune_members(days=14, roles=[unverifiedRole], compute_prune_count=True, reason=f"Kicked in the unverified kick run by {interaction.user}")
         await adminCommandLogs(interaction.user, f"Ran unverified kick. Removed {count} members", interaction.channel, self.bot)
@@ -291,7 +293,7 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
             roleID = settings.getMiscId("18+Role")
             roleObj = guild.get_role(roleID)
             if roleObj == None:
-                logging.critical("[18+Role] in config is invalid!")
+                logger.critical("[18+Role] in config is invalid!")
                 raise Exception("[18+Role] in config is invalid!")
             if roleObj in target.roles:
                 await interaction.response.send_message(f"Removing {roleObj.name} from {target}...")
@@ -307,7 +309,7 @@ class adminSlash(commands.Cog, name="Admin Slash Commands"):
             roleID = settings.getMiscId("degenRole")
             roleObj = guild.get_role(roleID)
             if roleObj == None:
-                logging.critical("[degenRole] in config is invalid!")
+                logger.critical("[degenRole] in config is invalid!")
                 raise Exception("[degenRole] in config is invalid!")
             if roleObj in target.roles:
                 await interaction.response.send_message(f"Removing {roleObj.name} from {target}...")
@@ -400,7 +402,7 @@ class userSlash(commands.Cog, name="User Slash Commands"):
 
 
 async def setup(bot: commands.Bot):
-    logging.info(f"{__file__} - Setting up...")
+    logger.info(f"{__file__} - Setting up...")
     guildID = int(settings.getMiscId("guildID"))
     await bot.add_cog(
         adminSlash(bot),
@@ -410,8 +412,8 @@ async def setup(bot: commands.Bot):
         userSlash(bot),
         guild=discord.Object(int(guildID))
     )
-    logging.info("Syncing tree...")
+    logger.info("Syncing tree...")
     sync = await bot.tree.sync(guild=discord.Object(int(guildID)))
-    logging.info(str(sync))
-    logging.info("Sync of tree complete!")
-    logging.info(f"{__file__} - Done!")
+    logger.info(str(sync))
+    logger.info("Sync of tree complete!")
+    logger.info(f"{__file__} - Done!")

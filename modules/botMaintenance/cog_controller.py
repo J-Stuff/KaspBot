@@ -1,5 +1,6 @@
 from discord.ext import commands
 import logging
+logger = logging.getLogger('kaspbot')
 import sys
 cogs = ['cogs.AdminCommands', 'cogs.Commands', 'cogs.LoopingFunctions', 'cogs.OnEvent']
 
@@ -34,37 +35,37 @@ class cogController():
 
     async def reloadCogs(self):
         if not self.removeCogs():
-            logging.fatal("Cog Reload Database Failure! -- Stopping to prevent database damage!")
-            logging.info("Cog Reload Database Failure! -- Stopping to prevent database damage!")
+            logger.fatal("Cog Reload Database Failure! -- Stopping to prevent database damage!")
+            logger.info("Cog Reload Database Failure! -- Stopping to prevent database damage!")
             sys.exit("Cog Reload Database Failure! -- Stopping to prevent database damage!")
         for cog in cogs:
-            logging.info(f"Reloading cog/extension: {cog}")
+            logger.info(f"Reloading cog/extension: {cog}")
             try:
                 await self.bot.reload_extension(cog)
             except (commands.ExtensionNotFound, commands.NoEntryPointError, commands.ExtensionFailed, commands.ExtensionNotFound) as e:
-                logging.fatal(f"Failed to load cog/extension: {cog} -- {e}")
-                logging.info(f"Failed to load cog/extension: {cog} -- {e}")
+                logger.fatal(f"Failed to load cog/extension: {cog} -- {e}")
+                logger.info(f"Failed to load cog/extension: {cog} -- {e}")
                 sys.exit(f"Failed to load cog/extension: {cog} -- {e}")
             
             if not self.addCog(cog):
-                logging.fatal("Cog Reload Database Failure! -- Stopping to prevent database damage!")
-                logging.info("Cog Reload Database Failure! -- Stopping to prevent database damage!")
+                logger.fatal("Cog Reload Database Failure! -- Stopping to prevent database damage!")
+                logger.info("Cog Reload Database Failure! -- Stopping to prevent database damage!")
                 sys.exit("Cog Reload Database Failure! -- Stopping to prevent database damage!")
                 
-            logging.info(f"Reloaded cog/extension: {cog}")
+            logger.info(f"Reloaded cog/extension: {cog}")
 
     async def initCogs(self):
         for cog in cogs:
-            logging.info(f"Loading cog/extension: {cog}")
+            logger.info(f"Loading cog/extension: {cog}")
             if not self.addCog(cog):
-                logging.fatal("Cog Load Database Failure! -- Stopping to prevent database damage!")
-                logging.info("Cog Load Database Failure! -- Stopping to prevent database damage!")
+                logger.fatal("Cog Load Database Failure! -- Stopping to prevent database damage!")
+                logger.info("Cog Load Database Failure! -- Stopping to prevent database damage!")
                 sys.exit("Cog Load Database Failure! -- Stopping to prevent database damage!")
             try:
                 await self.bot.load_extension(cog)
             except (commands.ExtensionNotFound, commands.NoEntryPointError, commands.ExtensionFailed) as e:
-                logging.fatal(f"Failed to load cog/extension: {cog} -- {e}")
-                logging.info(f"Failed to load cog/extension: {cog} -- {e}")
+                logger.fatal(f"Failed to load cog/extension: {cog} -- {e}")
+                logger.info(f"Failed to load cog/extension: {cog} -- {e}")
                 sys.exit(f"Failed to load cog/extension: {cog} -- {e}")
 
-            logging.info(f"Loaded cog/extension: {cog}")
+            logger.info(f"Loaded cog/extension: {cog}")

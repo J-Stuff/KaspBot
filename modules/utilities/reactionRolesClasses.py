@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import sys
 import logging
+logger = logging.getLogger('kaspbot')
 from modules.logging.userCommandLogs import userCommandLogs
 from modules.config.getConfig import settings as unsettings
 settings = unsettings()
@@ -14,17 +15,17 @@ class SpeciesRoles(discord.ui.View):
         targetRoleID = int(settings.getReactionRoleID("species", role))
         guild = interaction.guild
         if guild == None:
-            logging.info(f"Error: RR00-0 - {role}")
+            logger.info(f"Error: RR00-0 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR00-0 - {role}")
             sys.exit()
         targetRole = guild.get_role(targetRoleID)
         if targetRole == None:
-            logging.info(f"Error: RR00-1 - {role}")
+            logger.info(f"Error: RR00-1 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR00-1 - {role}")
             sys.exit()
         user = interaction.user
         if type(user) is not discord.Member:
-            logging.info(f"Error: RR00-2 - {role}")
+            logger.info(f"Error: RR00-2 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR00-2 - {role}")
             sys.exit()
         if targetRole in user.roles:
@@ -110,17 +111,17 @@ class ColorRoles(discord.ui.View):
         targetRoleID = int(settings.getReactionRoleID("color", role))
         guild = interaction.guild
         if guild == None:
-            logging.info(f"Error: RR01-0 - {role}")
+            logger.info(f"Error: RR01-0 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR01-0 - {role}")
             sys.exit()
         targetRole = guild.get_role(targetRoleID)
         if targetRole == None:
-            logging.info(f"Error: RR01-1 - {role}")
+            logger.info(f"Error: RR01-1 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR01-1 - {role}")
             sys.exit()
         user = interaction.user
         if type(user) is not discord.Member:
-            logging.info(f"Error: RR01-2 - {role}")
+            logger.info(f"Error: RR01-2 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR01-2 - {role}")
             sys.exit()
         if targetRole in user.roles:
@@ -178,17 +179,17 @@ class SORoles(discord.ui.View):
         targetRoleID = int(settings.getReactionRoleID("orientation", role))
         guild = interaction.guild
         if guild == None:
-            logging.info(f"Error: RR02-0 - {role}")
+            logger.info(f"Error: RR02-0 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR02-0 - {role}")
             sys.exit()
         targetRole = guild.get_role(targetRoleID)
         if targetRole == None:
-            logging.info(f"Error: RR02-1 - {role}")
+            logger.info(f"Error: RR02-1 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR02-1 - {role}")
             sys.exit()
         user = interaction.user
         if type(user) is not discord.Member:
-            logging.info(f"Error: RR02-2 - {role}")
+            logger.info(f"Error: RR02-2 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR02-2 - {role}")
             sys.exit()
         if targetRole in user.roles:
@@ -233,17 +234,17 @@ class GenderRoles(discord.ui.View):
         targetRoleID = int(settings.getReactionRoleID("gender", role))
         guild = interaction.guild
         if guild == None:
-            logging.info(f"Error: RR03-0 - {role}")
+            logger.info(f"Error: RR03-0 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR03-0 - {role}")
             sys.exit()
         targetRole = guild.get_role(targetRoleID)
         if targetRole == None:
-            logging.info(f"Error: RR03-1 - {role}")
+            logger.info(f"Error: RR03-1 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR03-1 - {role}")
             sys.exit()
         user = interaction.user
         if type(user) is not discord.Member:
-            logging.info(f"Error: RR03-2 - {role}")
+            logger.info(f"Error: RR03-2 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR03-2 - {role}")
             sys.exit()
         if targetRole in user.roles:
@@ -276,17 +277,17 @@ class PronounRoles(discord.ui.View):
         targetRoleID = int(settings.getReactionRoleID("pronoun", role))
         guild = interaction.guild
         if guild == None:
-            logging.info(f"Error: RR04-0 - {role}")
+            logger.info(f"Error: RR04-0 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR04-0 - {role}")
             sys.exit()
         targetRole = guild.get_role(targetRoleID)
         if targetRole == None:
-            logging.info(f"Error: RR04-1 - {role}")
+            logger.info(f"Error: RR04-1 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR04-1 - {role}")
             sys.exit()
         user = interaction.user
         if type(user) is not discord.Member:
-            logging.info(f"Error: RR04-2 - {role}")
+            logger.info(f"Error: RR04-2 - {role}")
             await interaction.response.send_message(f"Internal Error, Please report this. | RR04-2 - {role}")
             sys.exit()
         if targetRole in user.roles:
@@ -321,4 +322,4 @@ def init(bot:commands.Bot):
     bot.add_view(SORoles(bot))
     bot.add_view(GenderRoles(bot))
     bot.add_view(PronounRoles(bot))
-    logging.info("Init of Reaction Role Classes Complete!")
+    logger.info("Init of Reaction Role Classes Complete!")

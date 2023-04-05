@@ -1,8 +1,8 @@
 import discord
 import sys
 import time
-import random
 import logging
+logger = logging.getLogger('kaspbot')
 from tinydb import TinyDB, Query
 from discord.ext import commands
 from discord.utils import format_dt
@@ -20,18 +20,18 @@ class verificationQuestionare(discord.ui.Modal, title='Verification', ):
     rulesAgreement = discord.ui.TextInput(label="Have you read and agree to the rules", placeholder="YES or NO", min_length=2, max_length=3, style=discord.TextStyle.short)
 
     async def on_submit(self, interaction: discord.Interaction):
-        logging.debug("Verification Modal on submit")
+        logger.debug("Verification Modal on submit")
         with open('./database/raid.db', 'r') as fp:
             raidBool = fp.read()
-        logging.debug(f"Raid bool is [{raidBool}]")
+        logger.debug(f"Raid bool is [{raidBool}]")
         if raidBool == "1":
-            logging.warn("Raid mode enabled, failing verification!")
+            logger.warn("Raid mode enabled, failing verification!")
             return
-        logging.debug("Adding user to the requested verification database to prevent duplicate requests from being made")
+        logger.debug("Adding user to the requested verification database to prevent duplicate requests from being made")
         db = TinyDB('./database/verification.json')
         db.insert({"id": str(interaction.user.id)})
         db.close()
-        logging.debug("Inserted entry to database!")
+        logger.debug("Inserted entry to database!")
         verif = verificationNotify(self.bot)
         await verif.notify(interaction1=interaction, q1=self.whyJoin, q2=self.howInvite, q3=self.rulesAgreement, sender=interaction.user.id)
         await interaction.response.send_message("Thanks for your response. I've recorded your answers and sent a notification to the moderators who will review your response and verify your account if you meet our requirements. I'll DM you when that happens!", ephemeral=True)
@@ -53,11 +53,11 @@ class verificationNotify():
     async def notify(self, q1, q2, q3, interaction1:discord.Interaction, sender:int):
         verificationNotificationChannel = settings.getChannelID("verificationNotif")
         if verificationNotificationChannel == None:
-            logging.info("BAD SETTING verificationNotificationChannel")
+            logger.info("BAD SETTING verificationNotificationChannel")
             sys.exit()
         notifyChannel = self.bot.get_channel(int(verificationNotificationChannel))
         if notifyChannel == None or type(notifyChannel) is not discord.TextChannel :
-            logging.info("BAD SETTING verificationNotificationChannel")
+            logger.info("BAD SETTING verificationNotificationChannel")
             sys.exit()
         embed = discord.Embed(title="Verification Request", description=f"Account created {format_dt(interaction1.user.created_at, 'D')} @ {format_dt(interaction1.user.created_at, 'T')}\n(Which was: {format_dt(interaction1.user.created_at, 'R')})", color=discord.colour.parse_hex_number("22942f"))
         embed.add_field(name="Response 1: Why do you want to join our server?", value=q1, inline=False)
@@ -115,14 +115,14 @@ class verificationNotify():
             try:
                 await updatedTarget.remove_roles(unv_role)
             except discord.HTTPException:
-                logging.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
+                logger.error(f"Failed to remove the unverified role from {updatedTarget.id}. They likely didn't have the role!")
             
             await adminCommandLogs(interaction.user, f"Verification Button\nVerified <@{sender}> (`{sender}`)!", interaction.channel, self.bot)
             try:
                 embed = discord.Embed(title="Verification", description=f"Your verification request in {guild.name} was accepted.\nWelcome!", color=discord.colour.parse_hex_number("e0c537"))
                 await updatedTarget.send(embed=embed)
             except discord.Forbidden:
-                logging.error(f"Failed to notify {updatedTarget.id} that they have passed verification. They probably have their DM's off.")
+                logger.error(f"Failed to notify {updatedTarget.id} that they have passed verification. They probably have their DM's off.")
                 await interaction.followup.send(f"Failed to notify {updatedTarget.id} that they have passed verification. They probably have their DM's off.", ephemeral=True)
             embedDone = discord.Embed(
                 title="Verification", color=discord.colour.parse_hex_number("289100"))
@@ -133,7 +133,7 @@ class verificationNotify():
             await interaction.followup.edit_message(message_id=loader.id, embed=embedDone)
             welcomeChannel = await guild.fetch_channel(settings.getChannelID("welcomeChanel"))
             if not welcomeChannel or type(welcomeChannel) is not discord.TextChannel:
-                logging.fatal("[welcomeChanel] doesn't point me to a valid channel!")
+                logger.fatal("[welcomeChanel] doesn't point me to a valid channel!")
                 return
             await welcomeChannel.send(f"Welcome, {updatedTarget.mention}!")
             verifyButton.disabled = True

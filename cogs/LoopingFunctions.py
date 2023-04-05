@@ -1,8 +1,9 @@
-import logging
 from discord.ext import commands, tasks
 import discord
 import random
 import json
+import logging
+logger = logging.getLogger('kaspbot')
 
 class Loop(commands.Cog, name="Loop cogs"):
     def __init__(self, bot:commands.Bot):
@@ -11,16 +12,16 @@ class Loop(commands.Cog, name="Loop cogs"):
 
     @tasks.loop(minutes=2)
     async def do_funStatus(self):
-        logging.debug("Rotating bot custom status")
-        logging.debug("Reading status DB")
+        logger.debug("Rotating bot custom status")
+        logger.debug("Reading status DB")
         with open("./database/status.json", 'r') as fp:
-            logging.debug("Parsing JSON")
+            logger.debug("Parsing JSON")
             statusList = json.load(fp)
             fp.close()
 
-        logging.debug("Picking a new status")
+        logger.debug("Picking a new status")
         newStatus = random.choice(statusList)
-        logging.debug(f"Using status: {newStatus}")
+        logger.debug(f"Using status: {newStatus}")
 
         if newStatus["type"] == "playing":
             statusMsg = discord.Game(name=newStatus["content"])
@@ -33,17 +34,17 @@ class Loop(commands.Cog, name="Loop cogs"):
         else:
             statusMsg = discord.Game(name="in a virtual paradise")
 
-        logging.debug("Rotating presence now...")
+        logger.debug("Rotating presence now...")
         await self.bot.change_presence(status=discord.Status.online, activity=statusMsg)
 
     @do_funStatus.before_loop
     async def beforeLogin(self):
-        logging.info("Waiting for websocket")
+        logger.info("Waiting for websocket")
         await self.bot.wait_until_ready()
 
 async def setup(bot:commands.Bot):
-    logging.info(f"{__file__} - Setting up...")
+    logger.info(f"{__file__} - Setting up...")
     await bot.add_cog(
         Loop(bot)
     )
-    logging.info(f"{__file__} - Done!")
+    logger.info(f"{__file__} - Done!")

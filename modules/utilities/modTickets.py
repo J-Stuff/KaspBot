@@ -3,6 +3,7 @@ import time
 import random
 import datetime
 import logging
+logger = logging.getLogger('kaspbot')
 from discord.utils import get
 from modules.logging.userCommandLogs import userCommandLogs
 from modules.config.getConfig import settings as unsettings
@@ -47,10 +48,10 @@ class ModTicket(discord.ui.View):
         await channel.set_permissions(interaction.user, view_channel=True, send_messages=True, embed_links=True, attach_files=True, read_message_history=True) #type:ignore
         newTicketEmbed = discord.Embed(title=f"New Ticket: {channel.name}", description="Welcome. Please describe your issue below and one of our moderators will respond shortly..", color=discord.colour.parse_hex_number("ff0000"), timestamp=datetime.datetime.now())
         pingPayload = ""
-        for id in settings.getMiscId("reportPing"):
+        for id in settings.getMiscId("reportPing"): #type:ignore
             targetRole = (guild.get_role(int(id)))
             if not targetRole:
-                logging.warning(f"I can't find the role with the ID of: {id}")
+                logger.warning(f"I can't find the role with the ID of: {id}")
                 continue
             pingPayload += targetRole.mention
             pingPayload += " "

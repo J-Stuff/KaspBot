@@ -2,5 +2,5 @@ requests
 python-dotenv
 discord.py
 tinydb
-discord-webhook-logging
 discord.py[voice]
+discord-webhook-logging
