@@ -1,6 +1,0 @@
-requests
-python-dotenv
-discord.py
-tinydb
-discord.py[voice]
-discord-webhook-logging
