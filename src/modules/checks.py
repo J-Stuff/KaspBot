@@ -1,9 +1,12 @@
 import discord
+from enum import Enum
 from discord.ext import commands
 from discord import app_commands
 from _kaspBot import KaspBot
 
 bot = KaspBot()
+
+
 
 @staticmethod
 def is_main_guild(interaction:discord.Interaction):
@@ -19,13 +22,14 @@ def is_dev_guild(interaction:discord.Interaction):
 def is_dm(interaction:discord.Interaction):
     return interaction.guild is None
 
+
 @staticmethod
 def is_main_guild_or_dev_guild(interaction:discord.Interaction):
     return interaction.guild.id in [bot.EnumGulds.MAIN, bot.EnumGulds.DEV] #type:ignore
 
 
 
-
+# Error handlers
 @is_main_guild.error
 async def is_main_guild_error(interaction:discord.Interaction, error:app_commands.AppCommandError):
     if isinstance(error, commands.CheckFailure):
