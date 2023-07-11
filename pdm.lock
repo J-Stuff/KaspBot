@@ -53,6 +53,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "discord-py-pagination"
+version = "0.0.5"
+summary = "Easily create pagination for your embeds."
+
+[[package]]
 name = "frozenlist"
 version = "1.3.3"
 requires_python = ">=3.7"
@@ -71,6 +76,12 @@ requires_python = ">=3.7"
 summary = "multidict implementation"
 
 [[package]]
+name = "tinydb"
+version = "4.8.0"
+requires_python = ">=3.7,<4.0"
+summary = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
+
+[[package]]
 name = "yarl"
 version = "1.9.2"
 requires_python = ">=3.7"
@@ -84,7 +95,7 @@ dependencies = [
 lock_version = "4.2"
 cross_platform = true
 groups = ["default"]
-content_hash = "sha256:dafdefda96e8ad221b06174b714de417f4dff2eec7dd8a732fcc84bbb3e4ac78"
+content_hash = "sha256:fa9752d2461336f8151fbfda907e12f81497866b14959b198df74791a3fe9322"
 
 [metadata.files]
 "aiohttp 3.8.4" = [
@@ -269,6 +280,10 @@ content_hash = "sha256:dafdefda96e8ad221b06174b714de417f4dff2eec7dd8a732fcc84bbb
     {url = "https://files.pythonhosted.org/packages/b5/78/241e04365a7dd8456f9b9e7db60c6e672a154d6683831aba03c3cda62756/discord.py-2.3.1-py3-none-any.whl", hash = "sha256:149652f24da299706270bf8c03c2fcf80cf1caf3a480744c61d5b001688b380d"},
     {url = "https://files.pythonhosted.org/packages/e8/7a/ca123a290022dc94aba41f8165be66d7b7da2fa775e06310e562bcc3ad89/discord.py-2.3.1.tar.gz", hash = "sha256:8eb4fe66b5d503da6de3a8425e23012711dc2fbcd7a782107a92beac15ee3459"},
 ]
+"discord-py-pagination 0.0.5" = [
+    {url = "https://files.pythonhosted.org/packages/18/7c/57786561631da3ae9d1a7b84abacba198e47010b14d89ca029b0b12fb27d/discord.py-pagination-0.0.5.tar.gz", hash = "sha256:94db6f36f9663d37b8bd721aa98984c4207b0cf49211cdea2751300bfd2ad252"},
+    {url = "https://files.pythonhosted.org/packages/e2/1f/b71bd07c1ba9d2d714d80640fe93eae530441038c8670f6cb1a917dc9bb9/discord.py_pagination-0.0.5-py3-none-any.whl", hash = "sha256:da28b8ecb0827eb991da701e0223f2cd9e0c12de0c0a0913f621430289b4bd1b"},
+]
 "frozenlist 1.3.3" = [
     {url = "https://files.pythonhosted.org/packages/01/a3/a3c18bfd7bd2a56831b985140f98eb6dda684a2d8b2a54b1077b45c7f9d9/frozenlist-1.3.3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:23d16d9f477bb55b6154654e0e74557040575d9d19fe78a161bd33d7d76808e8"},
     {url = "https://files.pythonhosted.org/packages/03/00/febbfd2ec244a0f91707bd879afe6aa278e337dc41cd9d0d25260e6da38e/frozenlist-1.3.3-cp38-cp38-win_amd64.whl", hash = "sha256:7f44e24fa70f6fbc74aeec3e971f60a14dde85da364aa87f15d1be94ae75aeef"},
@@ -424,6 +439,10 @@ content_hash = "sha256:dafdefda96e8ad221b06174b714de417f4dff2eec7dd8a732fcc84bbb
     {url = "https://files.pythonhosted.org/packages/fc/54/8e025ae4e31d899e4528a570941eb7048512392b454acccf69c2dccfcb0d/multidict-6.0.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:eeb6dcc05e911516ae3d1f207d4b0520d07f54484c49dfc294d6e7d63b734171"},
     {url = "https://files.pythonhosted.org/packages/fc/5b/0a4205a1248fb152f596a03c971c6ef1585d0c98e56b6886dc35d084e366/multidict-6.0.4-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:7d18748f2d30f94f498e852c67d61261c643b349b9d2a581131725595c45ec6c"},
     {url = "https://files.pythonhosted.org/packages/fe/0c/8469202f8f4b0e65816f91c3febc4bda7316c995b59ecdf3b15c574f7a24/multidict-6.0.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cc8e1d0c705233c5dd0c5e6460fbad7827d5d36f310a0fadfd45cc3029762258"},
+]
+"tinydb 4.8.0" = [
+    {url = "https://files.pythonhosted.org/packages/1c/c4/9a1721139a6087ab3df4ba99ac82da5d88f92b1ea5027b0c411ce09b1d70/tinydb-4.8.0-py3-none-any.whl", hash = "sha256:30c06d12383d7c332e404ca6a6103fb2b32cbf25712689648c39d9a6bd34bd3d"},
+    {url = "https://files.pythonhosted.org/packages/30/0b/9e75a8d3333a6a3d9b36de04bf87a37a8d7f100035ea23c9c37bf0a112ab/tinydb-4.8.0.tar.gz", hash = "sha256:6dd686a9c5a75dfa9280088fd79a419aefe19cd7f4bd85eba203540ef856d564"},
 ]
 "yarl 1.9.2" = [
     {url = "https://files.pythonhosted.org/packages/0e/b1/a65fcf0363ae8c08c0e586772a34cc15b4200bae163eed24258cc95cda90/yarl-1.9.2-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:566185e8ebc0898b11f8026447eacd02e46226716229cea8db37496c8cdd26e0"},
