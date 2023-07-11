@@ -20,7 +20,7 @@ class warn(commands.Cog):
     # {
     #     "user": [INT] Discord ID,
     #     "warnings": [LIST] List of warnings, structured as follows:
-    #                 {"time": UNIX, "reason": [STR] WARNING REASON, "moderator": [INT] Discord ID of the moderator}
+    #                 {"time": UNIX, "reason": [STR] WARNING REASON, "moderator": [INT] Discord ID of the moderator, "id": [INT] WARNING ID"}
     # }
 
     def getDB(self) -> TinyDB:
@@ -68,8 +68,9 @@ class warn(commands.Cog):
         if not self.check_if_user_in_db(user):
             self.create_data_for_new_user(user)
         currentWarnsList:list = db.search(User.id == user.id)[0]["warnings"]
-        currentWarnsList.append({"time": int(time.time()), "reason": reason, "moderator": mod.id})
+        currentWarnsList.append({"time": int(time.time()), "reason": reason, "moderator": mod.id, "id": len(currentWarnsList) + 1})
         db.update({"warnings": currentWarnsList}, User.id == user.id)
+        db.close()
 
         
 
@@ -77,9 +78,8 @@ class warn(commands.Cog):
     @app_commands.command(name="warn", description="[MOD] Warn a user")
     @app_commands.describe(target="User to Warn")
     @app_commands.describe(reason="Reason for Warning this user")
-    @app_commands.checks.has_permissions(ban_members=True)
     @app_commands.guild_only()
-    @app_commands.
+    @app_commands.check(is_mod)
     async def warnUser(self, interaction:discord.Interaction, target:discord.User, reason:str):
         warningEmbed = discord.Embed(title="You have received a Warning!", color=discord.colour.Color.brand_red(), description=f"You have received a Warning from {interaction.guild.name}", timestamp=datetime.datetime.now()) #type:ignore // This is for the interaction.guild.name property   
         warningEmbed.set_author(name=interaction.user, icon_url=interaction.user.display_avatar)
@@ -100,7 +100,8 @@ class warn(commands.Cog):
 
     @app_commands.command(name="warn-lookup", description="[MOD] Lookup previous warnings for a user")
     @app_commands.describe(target="User to check")
-    @app_commands.checks.has_permissions(ban_members=True)
+    @app_commands.guild_only()
+    @app_commands.check(is_mod)
     async def checkForWarn(self, interaction:discord.Interaction, target:discord.User|discord.Member):
         if not self.check_if_user_in_db(target):
             await interaction.response.send_message("This user isn't in my database. They haven't had any warns.", ephemeral=True)
@@ -115,7 +116,7 @@ class warn(commands.Cog):
         for chunk in chunkedWarns:
             embed = discord.Embed(title=f"Warnings for {target}", color=discord.colour.Color.dark_red())
             for warn in chunk:
-                embed.add_field(name=f"Warned by {self.bot.get_user(warn['moderator'])}", value=f"**Reason:** {warn['reason']}\n**Time:** {format_dt(datetime.datetime.fromtimestamp(warn['time']))}")
+                embed.add_field(name=f"Warned by {self.bot.get_user(warn['moderator'])}", value=f"**Reason:** {warn['reason']}\n**Time:** {format_dt(datetime.datetime.fromtimestamp(warn['time']))}, **ID:** `{warn['id']}`", inline=False)
             pages.append(embed)
         await Paginator.Simple(
             ephemeral=True,
@@ -123,3 +124,30 @@ class warn(commands.Cog):
             NextButton=discord.ui.Button(style=discord.ButtonStyle.blurple, label="->"),
             ).start(ctx=interaction, pages=pages)
         
+
+    @app_commands.command(name="warn-remove", description="[MOD] Remove a warning from a user")
+    @app_commands.describe(target="User to remove warning from")
+    @app_commands.describe(warn_id="ID of the warning to remove")
+    @app_commands.guild_only()
+    @app_commands.check(is_mod)
+    async def removeWarn(self, interaction:discord.Interaction, target:discord.User|discord.Member, warn_id:int):
+        if not self.check_if_user_in_db(target):
+            await interaction.response.send_message("This user isn't in my database. They haven't had any warns.", ephemeral=True)
+            return
+        data = self.get_user_data(target)
+        if not data:
+            await interaction.response.send_message("This user has no logged warns.", ephemeral=True)
+            return
+        allWarns = data["warnings"]
+        for warn in allWarns:
+            if warn["id"] == warn_id:
+                allWarns.remove(warn)
+                break
+        else:
+            await interaction.response.send_message("This user doesn't have a warn with that ID.", ephemeral=True)
+            return        
+        db = self.getDB()
+        User = Query()
+        db.update({"warnings": allWarns}, User.id == target.id)
+        db.close()
+        await interaction.response.send_message("I successfully removed the warning from the user.", ephemeral=True)
