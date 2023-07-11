@@ -15,6 +15,9 @@ class Boop(commands.Cog):
     async def boop(self, interaction:discord.Interaction, user:discord.User):
         logging.info(f"{interaction.user} booped {user}")
         selectedBoop = random.choice(os.listdir("./src/assets/boops"))
+        if interaction.user == user:
+            await interaction.response.send_message(f"{interaction.user.mention} *boops* themselves", ephemeral=False, file=discord.File(f"./src/assets/boops/{selectedBoop}"))
+            return
         await interaction.response.send_message(f"{interaction.user.mention} *boops* {user.mention}", ephemeral=False, file=discord.File(f"./src/assets/boops/{selectedBoop}"))
 
 

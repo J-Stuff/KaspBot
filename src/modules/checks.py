@@ -27,6 +27,9 @@ def is_dm(interaction:discord.Interaction):
 def is_main_guild_or_dev_guild(interaction:discord.Interaction):
     return interaction.guild.id in [bot.EnumGulds.MAIN, bot.EnumGulds.DEV] #type:ignore
 
+@staticmethod
+def is_mod(interaction:discord.Interaction):
+    return interaction.user.guild_permissions.manage_messages #type:ignore
 
 
 # Error handlers
@@ -57,5 +60,13 @@ async def is_dm_error(interaction:discord.Interaction, error:app_commands.AppCom
 async def is_main_guild_or_dev_guild_error(interaction:discord.Interaction, error:app_commands.AppCommandError):
     if isinstance(error, commands.CheckFailure):
         await interaction.response.send_message('This command can only be used in the main guild or the dev guild', ephemeral=True)
+    else:
+        raise error
+
+
+@is_mod.error
+async def is_mod_error(interaction:discord.Interaction, error:app_commands.AppCommandError):
+    if isinstance(error, commands.CheckFailure):
+        await interaction.response.send_message('You must be a moderator to use this command', ephemeral=True)
     else:
         raise error

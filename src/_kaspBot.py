@@ -80,6 +80,7 @@ StatusList = [
 # Bot Cogs
 Cogs = [
     'commands.about',
+    'commands.boop',
     'functions.status',
 ]
 
