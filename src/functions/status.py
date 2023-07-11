@@ -11,7 +11,7 @@ class Status(commands.Cog):
         super().__init__()
 
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(seconds=240)
     async def status_loop(self):
         logging.info("Updating status")
         selectedStatus = random.choice(self.bot.statuses)
