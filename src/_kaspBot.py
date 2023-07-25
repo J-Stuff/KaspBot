@@ -231,9 +231,11 @@ StatusList = [
 
 # Bot Cogs
 Cogs = [
-    'commands.about',
-    'commands.boop',
-    'functions.status',
+    'src.commands.about',
+    'src.commands.boop',
+    'src.functions.status',
+    'src.functions.attachmentLogging',
+    'src.commands.unverified_purge',
 ]
 
 
@@ -256,6 +258,7 @@ logging.info("Bot started at " + now.strftime("%Y-%m-%d %H:%M:%S"))
 class KaspBot(commands.Bot):
     def __init__(self):
         self.uptime = now
+        self.CogList = Cogs
         self.info = Info
         self.EnumGulds = Guilds
         self.EnumMainGuild = MainGuild

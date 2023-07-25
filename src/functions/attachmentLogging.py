@@ -17,7 +17,8 @@ class AttachmentLogging(commands.Cog):
         if message.attachments:
             for attachment in message.attachments:
                 if message.guild.filesize_limit > attachment.size: continue
-                tempLocation = f"temp/{random.randint(1, 100)}.tmp"
+                tempLocation = f"temp/{attachment.filename}"
+                
                 with open(tempLocation, "wb") as f:
                     await attachment.save(f)
                 channel = self.bot.get_channel(self.bot.EnumMainGuild.CHANNELS.value.ATTACHMENT_LOGS)
@@ -34,3 +35,7 @@ class AttachmentLogging(commands.Cog):
                 except:
                     pass
                 os.remove(tempLocation)
+
+
+async def setup(bot:KaspBot):
+    await bot.add_cog(AttachmentLogging(bot))
