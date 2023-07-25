@@ -39,3 +39,6 @@ class UnverifiedPurge(commands.Cog):
             await interaction.followup.send("Purging all unverified users...", ephemeral=True)
             await guild.prune_members(days=7, compute_prune_count=False, roles=[unverifiedRole], reason="Unverified purge")
             await interaction.followup.send("Successfully purged all unverified users.", ephemeral=True)
+        else:
+            await interaction.followup.send("Incorrect challenge code. Action cancelled.", ephemeral=True)
+            return
